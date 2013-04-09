@@ -1,3 +1,14 @@
+/**
+ *  Main project file
+ *  
+ *  @author Andrew Hollenbach <anh7216@rit.edu>
+ *  @author Andrew DeVoe <ard5852@rit.edu>
+ * 
+ * 
+ * 
+ * 
+ */
+
 package steam.dbexplorer;
 
 import java.util.List;
