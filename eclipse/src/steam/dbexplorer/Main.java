@@ -11,6 +11,8 @@
 
 package steam.dbexplorer;
 
+import java.sql.DriverManager;
+import java.sql.*;
 import java.util.List;
 
 import com.github.koraktor.steamcondenser.exceptions.SteamCondenserException;
@@ -24,7 +26,7 @@ public class Main {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		SteamId id;
+		/*SteamId id;
 		try {
 			//basic steam API code, TEST
 			id = SteamId.create("demomenz");
@@ -34,7 +36,29 @@ public class Main {
 			int x = 0;
 		} catch (SteamCondenserException e) {
 			e.printStackTrace();
+		} */
+		try {
+			Connection con;
+			Statement stmt;
+			String url = "jdbc:postgresql://reddwarf.cs.rit.edu/p48501c";
+			Class.forName("org.postgresql.Driver");
+			con = DriverManager.getConnection(url, "p48501c","moovaeheequeingo");
+			
+			stmt = con.createStatement();
+			
+			stmt.execute("select * from player;");
+			System.out.println(stmt.getResultSet().getMetaData().getColumnCount());
+			
+			
+			stmt.close();
+			con.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			
 		}
+		System.out.println("Test complete");
+		
 		
 	}
 
