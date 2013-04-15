@@ -406,12 +406,16 @@ public class SteamId {
             params.put("relationship", "friend");
             params.put("steamid", this.steamId64);
 
+            System.out.println("*"+WebApi.getJSON("ISteamUser", "GetFriendList", 1, params)+"*");
             JSONObject jsonData = new JSONObject(WebApi.getJSON("ISteamUser", "GetFriendList", 1, params));
             JSONArray friendsData = jsonData.getJSONObject("friendslist").getJSONArray("friends");
             this.friends = new ArrayList<SteamId>();
             for (int i = 0; i < friendsData.length(); i ++) {
                 JSONObject friend = friendsData.getJSONObject(i);
-                this.friends.add(new SteamId(friend.getLong("steamid"), false));
+                //System.out.println("()"+friend.getLong("steamid")+"()");
+                //this.friends.add(new SteamId(friend.getLong("steamid"), false));
+                System.out.println("()"+Long.parseLong(friend.getString("steamid"))+"()");
+                this.friends.add(new SteamId(Long.parseLong(friend.getString("steamid")), false));
             }
         } catch(JSONException e) {
             throw new WebApiException("Could not parse JSON data.", e);
