@@ -28,17 +28,17 @@ public class Main {
 	 */
 	public static void main(String[] args) {
 		try {
-			WebApi.setApiKey("C34383FDF1382FDD050F2E84B038E62B");
+			WebApi.setApiKey("STEAM API KEY HERE");
 			
 			Connection con;
 			Statement stmt;
-			String url = "jdbc:postgresql://reddwarf.cs.rit.edu/p48501c";
+			String url = "jdbc:postgresql://SERVER URL HERE";
 			Class.forName("org.postgresql.Driver");
-			con = DriverManager.getConnection(url, "p48501c","moovaeheequeingo");
+			con = DriverManager.getConnection(url, "DBUSERNAME","DBPASSWORD");
 			
 			stmt = con.createStatement();
 			
-			stmt.execute("select * from player where personaName = 'Tonbo';");
+			stmt.execute("select * from player;");
 			SteamId id;
 			List<SteamId> friends;
 			try {
