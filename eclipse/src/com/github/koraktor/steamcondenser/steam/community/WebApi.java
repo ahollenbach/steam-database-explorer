@@ -236,7 +236,6 @@ abstract public class WebApi {
             throws WebApiException {
         String url = String.format("http://api.steampowered.com/%s/%s/v%04d/?", apiInterface, method, version);
 
-        System.out.println("url:"+url);
         if(params == null) {
             params = new HashMap<String, Object>();
         }
@@ -250,10 +249,8 @@ abstract public class WebApi {
             } else {
                 url += '&';
             }
-            System.out.println("url:"+url);
             url += String.format("%s=%s", param.getKey(), param.getValue());
         }
-        System.out.println("url:"+url);
 
         LOG.info("Querying Steam Web API: " + url.replace(apiKey, "SECRET"));
 
@@ -280,7 +277,6 @@ abstract public class WebApi {
             throw new WebApiException("Could not communicate with the Web API.", e);
         }
 
-        System.out.println("~"+data+"~");
         return data;
     }
 
