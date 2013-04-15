@@ -28,13 +28,13 @@ public class Main {
 	 */
 	public static void main(String[] args) {
 		try {
-			WebApi.setApiKey("STEAM API KEY HERE");
+			WebApi.setApiKey(Credentials.APIKEY);
 			
 			Connection con;
 			Statement stmt;
-			String url = "jdbc:postgresql://SERVER URL HERE";
+			String url = Credentials.DATABASEURL;
 			Class.forName("org.postgresql.Driver");
-			con = DriverManager.getConnection(url, "DBUSERNAME","DBPASSWORD");
+			con = DriverManager.getConnection(url, Credentials.DATABASEUSERNAME ,Credentials.DATABASEPASSWORD);
 			
 			stmt = con.createStatement();
 			

@@ -1,4 +1,5 @@
 *.class
+Credentials.*
 
 # Package Files #
 *.war
