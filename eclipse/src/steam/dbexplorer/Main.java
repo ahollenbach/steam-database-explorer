@@ -45,6 +45,28 @@ public class Main {
 			steamId1 = l1;
 			steamId2 = l2;
 		}
+		
+		@Override
+		public int hashCode() {
+			return (int) (this.steamId1 * this.steamId2);
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if (!Pair.class.isInstance(obj)) {
+				return false;
+			}
+			else {
+				Pair other = (Pair) obj;
+				if ((this.steamId1 == other.steamId1) && (this.steamId2 == other.steamId2)) {
+					return true;
+				}
+				if ((this.steamId1 == other.steamId2) && (this.steamId2 == other.steamId1)) {
+					return true;
+				}
+				return false;
+			}
+		}
 	}
 	
 	public static Set<Pair> populatePlayers(int recursive, Statement stmt, Long longId) {
@@ -56,28 +78,22 @@ public class Main {
 			List<SteamId> friends = new ArrayList<SteamId>();
 			Set<Pair> friendsToAdd = new HashSet<Pair>();
 			try {
-				//basic steam API code, TEST
 				stmt.execute("select count(steamId) as playerExists from player where steamId = "+longId+";");
 				ResultSet rs = stmt.getResultSet();
 				rs.next();
 				if (rs.getInt("PlayerExists") > 0) {
-					return new HashSet<Pair>(); //We already called populatePlayer on this person
+					return friendsToAdd; //We already called populatePlayer on this person
 				}
 				id = SteamId.create(longId, true);
 				stmt.executeUpdate("insert into player values ("+id.getSteamId64()+", '"+id.getNickname()+"', '"+id.getCustomUrl()+"', null, null, null);");
 				try {
-					//if (id.getVisibilityState() == VISIBLE) {
+					if (id.getVisibilityState() == VISIBLE) {
 						friends = id.getFriends();
-					//}
+					}
 					for (SteamId temp:friends) {
 						try {
-							//if (((!friendsToAdd.containsKey(id.getSteamId64()) && !friendsToAdd.containsValue(temp.getSteamId64())) && 
-							//		(!friendsToAdd.containsValue(id.getSteamId64()) && !friendsToAdd.containsKey(temp.getSteamId64()))) ) {
-									friendsToAdd.add(new Pair(id.getSteamId64(), temp.getSteamId64()));
-							//	}
-							if ((recursive+1) != BRANCH) {
-								friendsToAdd.addAll((populatePlayers(recursive+1, stmt, temp.getSteamId64())));					
-							}
+							friendsToAdd.addAll((populatePlayers(recursive+1, stmt, temp.getSteamId64())));	
+							friendsToAdd.add(new Pair(id.getSteamId64(), temp.getSteamId64()));
 						} catch (Exception e) {
 							e.printStackTrace();
 						}
@@ -94,7 +110,11 @@ public class Main {
 					try {
 						stmt.executeUpdate("insert into friend values ("+p.steamId1+", "+p.steamId2+");");
 					} catch (Exception e) {
-						e.printStackTrace();
+						//e.printStackTrace();  Errors here are caused due to
+						//friends of "leaf nodes" in the graph of players not having their friends added
+						//thus they don't exist.  However, can't simply ignore them as they may
+						//have friendships to other "leafs:
+						System.err.println(e.getMessage());;
 					}
 				}
 				return new HashSet<Pair>();
