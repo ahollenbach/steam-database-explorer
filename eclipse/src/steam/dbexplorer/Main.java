@@ -4,9 +4,6 @@
  *  @author Andrew Hollenbach <anh7216@rit.edu>
  *  @author Andrew DeVoe <ard5852@rit.edu>
  * 
- * 
- * 
- * 
  */
 
 package steam.dbexplorer;
@@ -28,6 +25,7 @@ import com.github.koraktor.steamcondenser.steam.community.SteamId;
 import com.github.koraktor.steamcondenser.steam.community.WebApi;
 
 public class Main {
+	public static final String programName = "Steam Database Explorer";
 	
 	private final static int BRANCH = 2; //The produced friendship tree has a radius of BRANCH-1;
 	//Thus a BRANCH of 1 gets exactly one person (The center).
