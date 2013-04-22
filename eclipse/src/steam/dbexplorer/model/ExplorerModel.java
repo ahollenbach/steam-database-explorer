@@ -6,11 +6,44 @@
  */
 package steam.dbexplorer.model;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.HashMap;
+
+import com.github.koraktor.steamcondenser.steam.community.WebApi;
+
+import steam.dbexplorer.Credentials;
 import steam.dbexplorer.SystemCode;
 
 public class ExplorerModel {
 	
+	static Connection con;
+	
+    public static void setUp() {
+		try {
+			WebApi.setApiKey(Credentials.APIKEY);
+
+			String url = Credentials.DATABASEURL;
+			Class.forName("org.postgresql.Driver");
+			con = DriverManager.getConnection(url, Credentials.DATABASEUSERNAME ,Credentials.DATABASEPASSWORD);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+    }
+    
+    public static void tearDown() {
+    	try {
+		    con.close();
+    	} catch (Exception e) {
+        	e.printStackTrace();
+        }
+    }
+    
+    
 	/**
 	 * A map of the primary keys in the table. This is used in the generic
 	 * update/delete entity methods.
@@ -32,13 +65,24 @@ public class ExplorerModel {
 	 */
 	public static SystemCode createEntity(String entityName, Object[] values) {
 		//TODO Double-check this code for functionality
-		String query = "insert into " + entityName + " values (";
-		for(Object value : values) {
-			query += value.toString();
+		String createString = "insert into " + entityName + " values (";
+		for(int i = 0; i < values.length; i++) {
+			createString += values[i].toString();
+			if ( (i+1) < values.length ) {
+				createString += ", ";
+			}
 		}
-		query += ");";
-		//stmt.executeUpdate(query);
-		return SystemCode.FAILURE;
+		createString += ");";
+		
+		try {
+			PreparedStatement createStatement = con.prepareStatement(createString);
+			createStatement.execute();
+			return SystemCode.SUCCESS;
+		}
+		catch (SQLException e) {
+			e.printStackTrace();
+			return SystemCode.FAILURE;
+		}
 	}
 	
 	/**
@@ -52,7 +96,39 @@ public class ExplorerModel {
 	 * was an error processing the request, it will return null.
 	 */
 	public static Object[][] retrievePlayers(Object[] options) {
-		return null;
+		String commandString = "select * from player";
+		String[][] stringsToReturn = null;
+		if (options.length > 0) {
+			commandString += " where";	
+			for (int i = 0; i < options.length; i++) {
+				commandString += options[i].toString();
+				if ( (i+1) < options.length ) {
+					commandString += " and ";
+				}
+			}
+		}
+		commandString += ";";
+		try {
+			PreparedStatement commandStatement = con.prepareStatement(commandString);
+			commandStatement.execute();
+			ResultSet rs = commandStatement.getResultSet();           //TODO::Refactor this into a resultSet to Ovject[][] method
+			rs.last();
+			int rsRows = rs.getRow() - 1;
+			int rsCols = rs.getMetaData().getColumnCount();
+			stringsToReturn = new String[rsRows][rsCols];
+			
+			rs.beforeFirst();
+			for (int currentRow = 0; currentRow < rsRows; currentRow++) {
+				rs.next();
+				for (int currentColumn = 0; currentColumn < rsCols; currentColumn++) {
+					stringsToReturn[currentRow][currentColumn] = rs.getString(currentColumn); 
+				}
+				
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return stringsToReturn;
 	}
 	
 	/**
@@ -66,6 +142,18 @@ public class ExplorerModel {
 	 * was an error processing the request, it will return null.
 	 */
 	public static Object[][] retrieveFriends(Object[] options) {
+		String command = "select * from friend";
+		if (options.length > 0) {
+			command += " where";
+			
+			for (int i = 0; i < options.length; i++) {
+				command += options[i].toString();
+				if ( (i+1) < options.length ) {
+					command += " and ";
+				}
+			}
+		}
+		command += ";";
 		return null;
 	}
 	
