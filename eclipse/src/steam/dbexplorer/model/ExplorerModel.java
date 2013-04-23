@@ -97,7 +97,7 @@ public class ExplorerModel {
 	 */
 	public static Object[][] retrievePlayers(Object[] options) {
 		String commandString = "select * from player";
-		String[][] stringsToReturn = null;
+		
 		if (options.length > 0) {
 			commandString += " where";	
 			for (int i = 0; i < options.length; i++) {
@@ -111,24 +111,12 @@ public class ExplorerModel {
 		try {
 			PreparedStatement commandStatement = con.prepareStatement(commandString);
 			commandStatement.execute();
-			ResultSet rs = commandStatement.getResultSet();           //TODO::Refactor this into a resultSet to Ovject[][] method
-			rs.last();
-			int rsRows = rs.getRow() - 1;
-			int rsCols = rs.getMetaData().getColumnCount();
-			stringsToReturn = new String[rsRows][rsCols];
+			return getObjectArray(commandStatement.getResultSet());
 			
-			rs.beforeFirst();
-			for (int currentRow = 0; currentRow < rsRows; currentRow++) {
-				rs.next();
-				for (int currentColumn = 0; currentColumn < rsCols; currentColumn++) {
-					stringsToReturn[currentRow][currentColumn] = rs.getString(currentColumn); 
-				}
-				
-			}
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		return stringsToReturn;
+		return null;
 	}
 	
 	/**
@@ -245,6 +233,32 @@ public class ExplorerModel {
 		return SystemCode.FAILURE;
 	}
 
+	/**
+	 * Takes in a result set and parses it, returning it as an array
+	 * of an array of objects.
+	 * 
+	 * @param rs The result set to parse
+	 * @return  The resulting collection
+	 * @throws SQLException Throws the SQLException if issues arise while parsing the ResultSet,
+	 *         assumed that issues will be handled on the caller's side.
+	 */
+	public static Object[][] getObjectArray(ResultSet rs) throws SQLException {
+		String[][] stringsToReturn = null;
+		rs.last();
+		int rsRows = rs.getRow() - 1;
+		int rsCols = rs.getMetaData().getColumnCount();
+		stringsToReturn = new String[rsRows][rsCols];
+		
+		rs.beforeFirst();
+		for (int currentRow = 0; currentRow < rsRows; currentRow++) {
+			rs.next();
+			for (int currentColumn = 0; currentColumn < rsCols; currentColumn++) {
+				stringsToReturn[currentRow][currentColumn] = rs.getString(currentColumn); 
+			}
+			
+		}
+		return stringsToReturn;
+	}
 	
 
 }
