@@ -65,17 +65,23 @@ public class ExplorerModel {
 	 */
 	public static SystemCode createEntity(String entityName, Object[] values) {
 		//TODO Double-check this code for functionality
-		String createString = "insert into " + entityName + " values (";
+		String createString = "insert into ? values (";
 		for(int i = 0; i < values.length; i++) {
-			createString += values[i].toString();
-			if ( (i+1) < values.length ) {
-				createString += ", ";
+			
+			if ( i != 0 ) {
+				createString += " ,";
 			}
+			createString += " ?";
 		}
 		createString += ");";
 		
+		
 		try {
-			PreparedStatement createStatement = con.prepareStatement(createString);
+			PreparedStatement createStatement = con.prepareStatement(createString, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
+			createStatement.setString(1, entityName);
+			for(int i = 0; i < values.length; i++) {
+				createStatement.setObject(i+2, values[i]);
+			}
 			createStatement.execute();
 			return SystemCode.SUCCESS;
 		}
@@ -99,7 +105,7 @@ public class ExplorerModel {
 		String commandString = "select * from player";
 		
 		if (options.length > 0) {
-			commandString += " where";	
+			commandString += " where ";	
 			for (int i = 0; i < options.length; i++) {
 				commandString += options[i].toString();
 				if ( (i+1) < options.length ) {
@@ -109,10 +115,9 @@ public class ExplorerModel {
 		}
 		commandString += ";";
 		try {
-			PreparedStatement commandStatement = con.prepareStatement(commandString);
+			PreparedStatement commandStatement = con.prepareStatement(commandString, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
 			commandStatement.execute();
 			return getObjectArray(commandStatement.getResultSet());
-			
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -132,7 +137,7 @@ public class ExplorerModel {
 	public static Object[][] retrieveFriends(Object[] options) {
 		String command = "select * from friend";
 		if (options.length > 0) {
-			command += " where";
+			command += " where ";
 			
 			for (int i = 0; i < options.length; i++) {
 				command += options[i].toString();
@@ -245,20 +250,42 @@ public class ExplorerModel {
 	public static Object[][] getObjectArray(ResultSet rs) throws SQLException {
 		String[][] stringsToReturn = null;
 		rs.last();
-		int rsRows = rs.getRow() - 1;
+		int rsRows = rs.getRow();
 		int rsCols = rs.getMetaData().getColumnCount();
 		stringsToReturn = new String[rsRows][rsCols];
 		
 		rs.beforeFirst();
 		for (int currentRow = 0; currentRow < rsRows; currentRow++) {
 			rs.next();
-			for (int currentColumn = 0; currentColumn < rsCols; currentColumn++) {
-				stringsToReturn[currentRow][currentColumn] = rs.getString(currentColumn); 
+			for (int currentColumn = 1; currentColumn <= rsCols; currentColumn++) {
+				stringsToReturn[currentRow][currentColumn-1] = rs.getString(currentColumn); 
 			}
-			
 		}
 		return stringsToReturn;
 	}
 	
+	//For (basic) testing
+	public static void main(String[] args) {
+		ExplorerModel.setUp();
+		
+		Object[] options = new Object[1];
+		String selection = "steamId = 76561197988083973";
+		//String selection = "personaName = 'Jeckel'";
+		options[0] = (Object) selection;
+		
+		Object[][] rv = ExplorerModel.retrievePlayers(options);
+		
+		Object[] aRow = rv[0];
+		for (int i = 0; i < aRow.length; i++) {
+			if (aRow[i] != null) {
+			System.out.print(aRow[i].toString() + " - ");
+			} 
+			else {
+				System.out.println("Null");
+			}
+		}
+		
+		ExplorerModel.tearDown();
+	}
 
 }
