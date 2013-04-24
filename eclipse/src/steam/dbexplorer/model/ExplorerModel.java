@@ -120,8 +120,8 @@ public class ExplorerModel {
 			return getObjectArray(commandStatement.getResultSet());
 		} catch (SQLException e) {
 			e.printStackTrace();
+			return null;
 		}
-		return null;
 	}
 	
 	/**
@@ -135,19 +135,26 @@ public class ExplorerModel {
 	 * was an error processing the request, it will return null.
 	 */
 	public static Object[][] retrieveFriends(Object[] options) {
-		String command = "select * from friend";
+		String commandString = "select * from friend";
 		if (options.length > 0) {
-			command += " where ";
+			commandString += " where ";
 			
 			for (int i = 0; i < options.length; i++) {
-				command += options[i].toString();
+				commandString += options[i].toString();
 				if ( (i+1) < options.length ) {
-					command += " and ";
+					commandString += " and ";
 				}
 			}
 		}
-		command += ";";
-		return null;
+		commandString += ";";
+		try {
+			PreparedStatement commandStatement = con.prepareStatement(commandString, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
+			commandStatement.execute();
+			return getObjectArray(commandStatement.getResultSet());
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return null;
+		}
 	}
 	
 	/**
@@ -161,7 +168,26 @@ public class ExplorerModel {
 	 * was an error processing the request, it will return null.
 	 */
 	public static Object[][] retrieveApplications(Object[] options) {
-		return null;
+		String commandString = "select * from application";
+		if (options.length > 0) {
+			commandString += " where ";
+			
+			for (int i = 0; i < options.length; i++) {
+				commandString += options[i].toString();
+				if ( (i+1) < options.length ) {
+					commandString += " and ";
+				}
+			}
+		}
+		commandString += ";";
+		try {
+			PreparedStatement commandStatement = con.prepareStatement(commandString, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
+			commandStatement.execute();
+			return getObjectArray(commandStatement.getResultSet());
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return null;
+		}
 	}
 	
 	/**
@@ -175,7 +201,26 @@ public class ExplorerModel {
 	 * was an error processing the request, it will return null.
 	 */
 	public static Object[][] retrieveAchievements(Object[] options) {
-		return null;
+		String commandString = "select * from achievement";
+		if (options.length > 0) {
+			commandString += " where ";
+			
+			for (int i = 0; i < options.length; i++) {
+				commandString += options[i].toString();
+				if ( (i+1) < options.length ) {
+					commandString += " and ";
+				}
+			}
+		}
+		commandString += ";";
+		try {
+			PreparedStatement commandStatement = con.prepareStatement(commandString, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
+			commandStatement.execute();
+			return getObjectArray(commandStatement.getResultSet());
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return null;
+		}
 	}
 	
 	/**
@@ -189,9 +234,24 @@ public class ExplorerModel {
 	 * array. If no entries are found, it will return an empty array. If there
 	 * was an error processing the request, it will return null.
 	 */
-	public static Object[][] retrieveOwnedAchievements
-								(long steamID, Object[] options) {
-		return null;
+	public static Object[][] retrieveOwnedAchievements (long steamId, Object[] options) {
+		String commandString = "select * from ownedAchievement where steamId = " + steamId;
+		if (options.length > 0) {
+			for (int i = 0; i < options.length; i++) {
+				if ( (i+1) < options.length ) {
+				commandString += " and " + options[i].toString();
+				}
+			}
+		}
+		commandString += ";" ;
+		try {
+			PreparedStatement commandStatement = con.prepareStatement(commandString, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
+			commandStatement.execute();
+			return getObjectArray(commandStatement.getResultSet());
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return null;
+		}
 	}
 	
 	/**
@@ -206,9 +266,24 @@ public class ExplorerModel {
 	 * array. If no entries are found, it will return an empty array. If there
 	 * was an error processing the request, it will return null.
 	 */
-	public static Object[][] retrieveOwnedApplications
-								(long steamID, Object[] options) {
-		return null;
+	public static Object[][] retrieveOwnedApplications (long steamId, Object[] options) {
+		String commandString = "select * from ownedApplication where steamId = " + steamId;
+		if (options.length > 0) {
+			for (int i = 0; i < options.length; i++) {
+				if ( (i+1) < options.length ) {
+				commandString += " and " + options[i].toString();
+				}
+			}
+		}
+		commandString += ";" ;
+		try {
+			PreparedStatement commandStatement = con.prepareStatement(commandString, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
+			commandStatement.execute();
+			return getObjectArray(commandStatement.getResultSet());
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return null;
+		}
 	}
 	
 	/**
@@ -221,7 +296,30 @@ public class ExplorerModel {
 	 * @return A system code describing the success or failure of the operation.
 	 */
 	public static SystemCode updateEntity(String entityName, Object[] values) {
+		if (true)
 		return SystemCode.FAILURE;
+		
+		String updateString = "update ? set ";
+		for(int i = 0; i < values.length; i++) {
+			if ( i != 0 ) {
+				updateString += " ,";
+			}
+			updateString += " ?";
+		}
+		updateString += "where ?;";
+		try {
+			PreparedStatement updateStatement = con.prepareStatement(updateString);
+			updateStatement.setString(1, entityName);
+			for(int i = 0; i < values.length; i++) {
+				updateStatement.setObject(i+2, values[i]);
+			}
+			updateStatement.execute();
+			return SystemCode.SUCCESS;
+		}
+		catch (SQLException e) {
+			e.printStackTrace();
+			return SystemCode.FAILURE;
+		}
 	}
 	
 	/**
@@ -233,9 +331,29 @@ public class ExplorerModel {
 	 * @param primaryKeys The primary keys used to uniquely identify an object.
 	 * @return A system code describing the success or failure of the operation.
 	 */
-	public static SystemCode deleteEntity
-								(String entityName, Object[] primaryKeys) {
-		return SystemCode.FAILURE;
+	public static SystemCode deleteEntity (String entityName, Object[] primaryKeys) {
+		String deleteString = "delete from ? where";
+		for(int i = 0; i < primaryKeys.length; i++) {
+			if ( i != 0 ) {
+				deleteString += " and";
+			}
+			deleteString += " ?";
+		}
+		deleteString += ";";
+		
+		try {
+			PreparedStatement deleteStatement = con.prepareStatement(deleteString);
+			deleteStatement.setString(1, entityName);
+			for(int i = 0; i < primaryKeys.length; i++) {
+				deleteStatement.setObject(i+2, primaryKeys[i]);
+			}
+			deleteStatement.execute();
+			return SystemCode.SUCCESS;
+		}
+		catch (SQLException e) {
+			e.printStackTrace();
+			return SystemCode.FAILURE;
+		}
 	}
 
 	/**
@@ -273,7 +391,8 @@ public class ExplorerModel {
 		//String selection = "personaName = 'Jeckel'";
 		options[0] = (Object) selection;
 		
-		Object[][] rv = ExplorerModel.retrievePlayers(options);
+		//Object[][] rv = ExplorerModel.retrievePlayers(options);
+		Object[][] rv = ExplorerModel.retrieveOwnedApplications(76561197988083973L, new Object[0][0]);
 		
 		Object[] aRow = rv[0];
 		for (int i = 0; i < aRow.length; i++) {
