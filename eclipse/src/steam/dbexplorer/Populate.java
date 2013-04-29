@@ -76,7 +76,7 @@ public class Populate {
 		}
 	}
 	
-	public static Set<Pair> populatePlayers(int recursive, Connection con, Long longId) {
+	public static Set<Pair> populatePlayers(int recursive, Connection con, Long longId, List<Integer> appsAdded) {
 		if (recursive == BRANCH) {
 			return new HashSet<Pair>();
 		}
@@ -93,6 +93,9 @@ public class Populate {
 				
 				String insertFriendString = "insert into friend values (?, ?);";
 				PreparedStatement insertFriendStatement = con.prepareStatement(insertFriendString);
+				
+				String insertAchievementString = "insert into OwnedAchievement values (?, ?, ?);";
+				PreparedStatement insertAchievementStatement = con.prepareStatement(insertAchievementString);
 				
 				SteamId id;
 				List<SteamId> friends = new ArrayList<SteamId>();
@@ -136,13 +139,42 @@ public class Populate {
 								insertAppStatement.setLong(1, owned.getKey());
 								insertAppStatement.setLong(2, id.getSteamId64());
 								insertAppStatement.execute();
+								if (appsAdded.contains(owned.getKey())) {
+									
+									
+									try {			
+							            Map<String, Object> param = new HashMap<String,Object>();
+										param.put("appid", owned.getKey());
+										param.put("steamid", id.getSteamId64());
+										param.put("format", "json");
+							            JSONObject jsonData = new JSONObject( WebApi.getJSON("ISteamUserStats", "GetPlayerAchievements", 1, param));
+							            JSONArray achievement = jsonData.getJSONObject("playerstats").getJSONArray("achievements");
+							            
+							            
+							            for (int i = 0; i < achievement.length(); i ++) {
+							            	try {
+								                JSONObject ach = achievement.getJSONObject(i);
+								                if (ach.getInt("achieved") == 1) {
+								                	insertAchievementStatement.setLong(1, owned.getKey());
+								                	insertAchievementStatement.setString(2, ach.getString("apiname"));
+								                	insertAchievementStatement.setLong(3, id.getSteamId64());
+								                	insertAchievementStatement.execute();
+								                }
+							                } catch (SQLException e) {
+							                	e.printStackTrace();
+							                }
+							            }
+									} catch (Exception e) {
+										e.printStackTrace();
+									}
+								}
 							} catch (Exception e) {
 								e.printStackTrace();
 							}
 						}
 						for (SteamId temp:friends) {
 							try {
-								friendsToAdd.addAll((populatePlayers(recursive+1, con, temp.getSteamId64())));	
+								friendsToAdd.addAll((populatePlayers(recursive+1, con, temp.getSteamId64(), appsAdded)));	
 								friendsToAdd.add(new Pair(id.getSteamId64(), temp.getSteamId64()));
 							} catch (Exception e) {
 								e.printStackTrace();
@@ -181,26 +213,58 @@ public class Populate {
 		}
 	}
 	
-	public static void populateApps(Connection con) {
+	public static List<Long> populateApps(Connection con) {
+		List<Long> appsAdded = new ArrayList<Long>();
 		try {			
             JSONObject jsonData = new JSONObject( WebApi.getJSON("ISteamApps", "GetAppList"));
             JSONArray appsData = jsonData.getJSONObject("applist").getJSONObject("apps").getJSONArray("app");
             
             String insertString = "insert into application values ( ?, ?);";
-            PreparedStatement updateApp = con.prepareStatement(insertString);
+            PreparedStatement insertStatement = con.prepareStatement(insertString);
             
             for (int i = 0; i < appsData.length(); i ++) {
                 JSONObject app = appsData.getJSONObject(i);
                 
-                updateApp.setLong(1, Long.parseLong(app.getString("appid")));
-                updateApp.setString(2, app.getString("name"));
+                insertStatement.setLong(1, Long.parseLong(app.getString("appid")));
+                insertStatement.setString(2, app.getString("name"));
 
                 try {
-                	updateApp.executeUpdate();
+                	insertStatement.execute();
+                	appsAdded.add(Long.parseLong(app.getString("appid")));
                 } catch (SQLException e) {
                 	e.printStackTrace();
                 }
             }
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+		return appsAdded;
+	}
+	
+	public static void populateAchievements(Connection con, List<Integer> apps) {
+		try {			
+			for (int currentApp = 0; currentApp < apps.size(); currentApp++) {
+				Map<String, Object> param = new HashMap<String,Object>();
+				param.put("gameid", apps.get(currentApp));
+				param.put("format", "json");
+	            JSONObject jsonData = new JSONObject( WebApi.getJSON("ISteamUserStats", "GetGlobalAchievementPercentagesForApp", 1, param));
+	            JSONArray achievement = jsonData.getJSONObject("achievementpercentages").getJSONObject("achievements").getJSONArray("achievement");
+	            
+	            String insertString = "insert into achievement values ( ?, ?);";
+	            PreparedStatement insertAchivement = con.prepareStatement(insertString);
+	            
+	            for (int i = 0; i < achievement.length(); i ++) {
+	                try {
+		                JSONObject ach = achievement.getJSONObject(i);
+		                insertAchivement.setLong(1, apps.get(currentApp));
+		                insertAchivement.setString(2, ach.getString("name"));
+
+	                	insertAchivement.execute();
+	                } catch (Exception e) {
+	                	e.printStackTrace();
+	                }
+	            }
+			}
         } catch(Exception e) {
             e.printStackTrace();
         }
@@ -211,25 +275,32 @@ public class Populate {
 			WebApi.setApiKey(Credentials.APIKEY);
 			
 			Connection con;
-			Statement stmt;
 			String url = Credentials.DATABASEURL;
 			Class.forName("org.postgresql.Driver");
 			con = DriverManager.getConnection(url, Credentials.DATABASEUSERNAME ,Credentials.DATABASEPASSWORD);
 			
-			stmt = con.createStatement();
+			List<Integer> appsAdded = new ArrayList<Integer>();
 			
+			//appsAdded.addAll(populateApps(con));  Is what we would do if we wanted to get all of the achievements on Steam
 			populateApps(con);
+			appsAdded.add(70);    //Half Life (has no achievements)
+			appsAdded.add(220);   //Half Life 2
+			appsAdded.add(240);   //Counter Strike: Source
+			appsAdded.add(260);   //Counter Strike: Source Beta
+			appsAdded.add(300);   //Day of Defeat: Source
+			appsAdded.add(440);   //Team Fortress 2
+			appsAdded.add(550);   //Left 4 Dead 2
+			appsAdded.add(570);   //Dota 2  (has no achievements)
+			appsAdded.add(1250);  //Killing Floor
+			appsAdded.add(221380);//Age of Empires II: HD Edition 
 			
-			//stmt.execute("select * from player;");
-			//ResultSet rs = stmt.getResultSet();
-			//rs.next();
-			//Long n = rs.getLong("steamId");
-			populatePlayers(0,con,76561197988083973L);
+			populateAchievements(con, appsAdded);
+			
+			populatePlayers(0,con,76561197988083973L, appsAdded);
 			//76561197988083973  -  Tonbo
 			//76561197988128323  -  WispingWinds
 			//76561198018660341  -  DROCK
 			
-			stmt.close();
 			con.close();
 		} catch (Exception e) {
 			e.printStackTrace();
