@@ -17,6 +17,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import steam.dbexplorer.controller.ExplorerController;
+import steam.dbexplorer.view.ExplorerView;
+
 import com.github.koraktor.steamcondenser.exceptions.SteamCondenserException;
 import com.github.koraktor.steamcondenser.steam.community.GameAchievement;
 import com.github.koraktor.steamcondenser.steam.community.GameStats;
@@ -31,6 +34,9 @@ public class Main {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		Populate.populate();
+		ExplorerController controller = new ExplorerController();
+		ExplorerView view = new ExplorerView(controller);
+		view.start();
+		//Populate.populate();
 	}
 }

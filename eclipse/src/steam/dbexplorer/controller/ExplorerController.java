@@ -17,6 +17,22 @@ public class ExplorerController {
 	//TODO populate tableLabels with proper values
 	private static final HashMap<String, Object[]> tableLabels = new HashMap<String, Object[]>();
 	
+	public static final String[] tableNames = {"Achievements", 
+										  	   "Applications", 
+										  	   "Friends", 
+										  	   "Owned Achievements", 
+										  	   "Owned Applications", 
+										  	   "Players" };
+	
+	public static final String[] supportedClauses = {"where",
+													 "sort by"};
+	
+	public static final String[] operators = {"less than",
+											  "less than or equal to",
+											  "equal to",
+											  "not equal to",
+											  "greater than or equal to",
+											  "greater than"};
 	/** 
 	 * A string value of the last entity type to be fetched. Might be 
 	 * deprecated.
@@ -28,11 +44,15 @@ public class ExplorerController {
 	
 	public Object[][] getData(String tableName, String[] options) {
 		this.currentTable = "";
-		return null;
+		Object[][] data = {{255,"playah","5/4/63"},
+						   {6464646,"person2","1/5/91"}};
+		return data;
 	}
 
-	public Object[] getLabels(String tableName) {
-		return tableLabels.get(tableName);
+	public String[] getLabels(String tableName) {
+		//return tableLabels.get(tableName);
+		String[] labels = {"Steam ID", "Persona Name", "Last Logged In"};
+		return labels;
 	}
 	
 	/**
@@ -49,6 +69,22 @@ public class ExplorerController {
 		Object[] valuesConvertedToObjects = values;
 		ExplorerModel.createEntity(entityName,valuesConvertedToObjects);
 		return false;
+	}
+
+	/**
+	 * Gets the attributes for a given table
+	 * 
+	 * @param tableName the table to fetch the attributes of
+	 * @return a list of attributes associated with the given table
+	 */
+	public String[] getAttr(String tableName) {
+		String[] attributes = {"steamID",
+							   "personaName",
+							   "profileURL",
+							   "lastLogoff",
+							   "realName",
+							   "timeCreated"};
+		return attributes;
 	}
 	
 	/* TODO make these functions
