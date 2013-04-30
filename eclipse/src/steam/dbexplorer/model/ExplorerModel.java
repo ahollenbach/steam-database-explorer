@@ -201,7 +201,8 @@ public class ExplorerModel {
 	 * was an error processing the request, it will return null.
 	 */
 	public static Object[][] retrieveAchievements(Object[] options) {
-		String commandString = "select * from achievement";
+		String commandString = "select achievement.appId, application.appName, achievement.achievementName from achievement";
+		commandString += " join application on achievement.appId = application.appId ";
 		if (options.length > 0) {
 			commandString += " where ";
 			
@@ -235,7 +236,11 @@ public class ExplorerModel {
 	 * was an error processing the request, it will return null.
 	 */
 	public static Object[][] retrieveOwnedAchievements (long steamId, Object[] options) {
-		String commandString = "select * from ownedAchievement where steamId = " + steamId;
+		String commandString = "select ownedAchievement.appId, ownedAchievement.achievementName, ownedAchievement.steamId, application.appName, player.personaName";
+		commandString += " from ownedAchievement";
+		commandString += " join application on ownedAchievement.appId = application.appId";
+		commandString += " join player on ownedAchievement.steamId = player.steamId";
+		commandString += " where steamId = " + steamId;
 		if (options.length > 0) {
 			for (int i = 0; i < options.length; i++) {
 				if ( (i+1) < options.length ) {
@@ -267,7 +272,11 @@ public class ExplorerModel {
 	 * was an error processing the request, it will return null.
 	 */
 	public static Object[][] retrieveOwnedApplications (long steamId, Object[] options) {
-		String commandString = "select * from ownedApplication where steamId = " + steamId;
+		String commandString = "select ownedApplication.appId, ownedApplication.steamId, application.appName, player.personaName";
+		commandString += " from ownedApplication";
+		commandString += " join application on ownedApplication.appId = application.appId";
+		commandString += " join player on ownedApplication.steamId = player.steamId";
+		commandString += " where steamId = " + steamId;
 		if (options.length > 0) {
 			for (int i = 0; i < options.length; i++) {
 				if ( (i+1) < options.length ) {
