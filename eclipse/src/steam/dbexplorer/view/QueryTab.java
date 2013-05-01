@@ -27,6 +27,7 @@ public class QueryTab extends JPanel {
 	JTextField curVal;
 	JPanel selectionPanel;
 	private ExplorerController controller;
+	private ResultsTab resultsTab;
 	
 	public QueryTab(ExplorerController controller) {
 		super();
@@ -44,6 +45,13 @@ public class QueryTab extends JPanel {
 		
 		selectionPanel = createSelectionPanel();
 		JButton runQuery = new JButton ("Run");
+		runQuery.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent ae) {
+            	String table = (String) currentTableName.getSelectedItem();
+            	resultsTab.updateTable(table);
+            	//.setSelectedIndex(0);
+            }
+        });	
 		
 		this.add(pickTable);
 		this.add(constraintsPanel);
@@ -156,5 +164,10 @@ public class QueryTab extends JPanel {
 		p.add(clear);
 		
 		return p;
+	}
+
+
+	public void setResultsPanelRef(ResultsTab resultPanel) {
+		this.resultsTab = resultPanel;
 	}
 }

@@ -54,13 +54,16 @@ public class ExplorerView {
 	private void buildTabs() {
 		tabs = new JTabbedPane();
 		
-		JComponent queryPanel = new QueryTab(controller);
+		QueryTab queryPanel = new QueryTab(controller);
 		tabs.addTab("Build a Query", null, queryPanel, "Build a query here");
 		tabs.setMnemonicAt(0, KeyEvent.VK_1);
 		
-		JComponent resultPanel = new ResultsTab(controller);
+		ResultsTab resultPanel = new ResultsTab(controller);
 		tabs.addTab("Results", null, resultPanel, "View results here");
 		tabs.setMnemonicAt(1, KeyEvent.VK_2);
+		
+		resultPanel.setQueryPanelRef(queryPanel);
+		queryPanel.setResultsPanelRef(resultPanel);
 	}
 	
 	@SuppressWarnings("unused")

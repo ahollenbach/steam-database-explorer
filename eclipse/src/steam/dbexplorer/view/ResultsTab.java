@@ -17,6 +17,7 @@ import steam.dbexplorer.controller.ExplorerController;
 
 public class ResultsTab extends JPanel {
 	private ExplorerController controller;
+	private QueryTab queryTab;
 	
 	private JTable results;
 	private JScrollPane scrollPane;
@@ -40,6 +41,11 @@ public class ResultsTab extends JPanel {
 		scrollPane = new JScrollPane(results);
 		results.setFillsViewportHeight(true);
 	}
+	
+	public void updateTable(String tableName) {
+		String[] tmp = {};
+		results.setModel(new DefaultTableModel(controller.getData(tableName,tmp), controller.getLabels(tableName)));
+	}
 
 	private JPanel createCUDPanel(String addDeleteWhat) {
 		JPanel p = new JPanel();
@@ -60,5 +66,9 @@ public class ResultsTab extends JPanel {
 		p.add(delete);
 		
 		return p;
+	}
+
+	public void setQueryPanelRef(QueryTab queryPanel) {
+		this.queryTab = queryPanel;
 	}
 }

@@ -15,7 +15,7 @@ import steam.dbexplorer.model.ExplorerModel;
 public class ExplorerController {
 	
 	//TODO populate tableLabels with proper values
-	private static final HashMap<String, Object[]> tableLabels = new HashMap<String, Object[]>();
+	private static HashMap<String, String[]> tableLabels;
 	
 	public static final String[] tableNames = {"Achievements", 
 										  	   "Applications", 
@@ -40,18 +40,41 @@ public class ExplorerController {
 	private String currentTable;
 	
 	public ExplorerController() {
+		tableLabels = new HashMap<String, String[]>();
+		String[][] labels = {{"Application ID", "Achievement Name"},
+							 {"Application ID", "Application Name"},
+							 {"Steam ID #1", "Steam ID #2"},
+							 {"Application ID", "Achievement Name", "Steam ID"},
+							 {"Application ID", "Steam ID"},
+							 {"Steam ID", "Persona Name", "Profile URL", "Real Name", "Date Joined"}};
+		for(int i=0;i<tableNames.length;i++) {
+			tableLabels.put(tableNames[i], labels[i]);
+		}
 	}
 	
 	public Object[][] getData(String tableName, String[] options) {
-		this.currentTable = "";
-		Object[][] data = {{255,"playah","5/4/63"},
-						   {6464646,"person2","1/5/91"}};
+		this.currentTable = tableName;
+		ExplorerModel.setUp();
+		Object[][] data = {};
+		if(tableName == null) {
+		} else if(tableName.equals("Achievements")) {
+			data = ExplorerModel.retrieveAchievements(options);
+		} else if(tableName.equals("Applications")) {
+			data = ExplorerModel.retrieveApplications(options);
+		} else if(tableName.equals("Friends")) {
+			data = ExplorerModel.retrieveFriends(options);
+		} else if(tableName.equals("Owned Achievements")) {
+			data = ExplorerModel.retrieveOwnedAchievements(76561198049281288L, options);
+		} else if(tableName.equals("Owned Applications")) {
+			data = ExplorerModel.retrieveOwnedApplications(76561198049281288L, options);
+		} else if(tableName.equals("Players")) {
+			data = ExplorerModel.retrievePlayers(options);
+		}
 		return data;
 	}
 
 	public String[] getLabels(String tableName) {
-		//return tableLabels.get(tableName);
-		String[] labels = {"Steam ID", "Persona Name", "Last Logged In"};
+		String[] labels = tableLabels.get(tableName);
 		return labels;
 	}
 	
