@@ -240,7 +240,7 @@ public class ExplorerModel {
 		commandString += " from ownedAchievement";
 		commandString += " join application on ownedAchievement.appId = application.appId";
 		commandString += " join player on ownedAchievement.steamId = player.steamId";
-		commandString += " where steamId = " + steamId;
+		commandString += " where player.steamId = " + steamId;
 		if (options.length > 0) {
 			for (int i = 0; i < options.length; i++) {
 				if ( (i+1) < options.length ) {
@@ -276,7 +276,7 @@ public class ExplorerModel {
 		commandString += " from ownedApplication";
 		commandString += " join application on ownedApplication.appId = application.appId";
 		commandString += " join player on ownedApplication.steamId = player.steamId";
-		commandString += " where steamId = " + steamId;
+		commandString += " where player.steamId = " + steamId;
 		if (options.length > 0) {
 			for (int i = 0; i < options.length; i++) {
 				if ( (i+1) < options.length ) {

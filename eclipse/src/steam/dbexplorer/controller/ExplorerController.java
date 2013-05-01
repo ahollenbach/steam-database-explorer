@@ -41,12 +41,12 @@ public class ExplorerController {
 	
 	public ExplorerController() {
 		tableLabels = new HashMap<String, String[]>();
-		String[][] labels = {{"Application ID", "Achievement Name"},
-							 {"Application ID", "Application Name"},
-							 {"Steam ID #1", "Steam ID #2"},
-							 {"Application ID", "Achievement Name", "Steam ID"},
-							 {"Application ID", "Steam ID"},
-							 {"Steam ID", "Persona Name", "Profile URL", "Real Name", "Date Joined"}};
+		String[][] labels = {{"Application ID", "Application Name", "Achievement Name"}, //Achievements
+							 {"Application ID", "Application Name"}, //Applications
+							 {"Steam ID #1", "Steam ID #2"}, //Friends
+							 {"Application ID", "Achievement Name", "Steam ID", "Application Name", "Persona Name"}, //Owned achievements
+							 {"Application ID", "Steam ID", "Application Name", "Persona Name"}, //Owned applications
+							 {"Steam ID", "Persona Name", "Profile URL", "Real Name", "Date Joined"}}; //player
 		for(int i=0;i<tableNames.length;i++) {
 			tableLabels.put(tableNames[i], labels[i]);
 		}

@@ -44,7 +44,9 @@ public class ResultsTab extends JPanel {
 	
 	public void updateTable(String tableName) {
 		String[] tmp = {};
-		results.setModel(new DefaultTableModel(controller.getData(tableName,tmp), controller.getLabels(tableName)));
+		Object[][] data = controller.getData(tableName,tmp);
+		String[] labels = controller.getLabels(tableName);
+		results.setModel(new DefaultTableModel(data,labels));
 	}
 
 	private JPanel createCUDPanel(String addDeleteWhat) {
