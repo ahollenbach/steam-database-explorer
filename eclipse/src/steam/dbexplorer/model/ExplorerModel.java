@@ -236,7 +236,7 @@ public class ExplorerModel {
 	 * was an error processing the request, it will return null.
 	 */
 	public static Object[][] retrieveOwnedAchievements (long steamId, Object[] options) {
-		String commandString = "select ownedAchievement.appId, ownedAchievement.achievementName, ownedAchievement.steamId, application.appName, player.personaName";
+		String commandString = "select ownedAchievement.appId, application.appName, ownedAchievement.steamId, player.personaName, ownedAchievement.achievementName";
 		commandString += " from ownedAchievement";
 		commandString += " join application on ownedAchievement.appId = application.appId";
 		commandString += " join player on ownedAchievement.steamId = player.steamId";
@@ -272,7 +272,7 @@ public class ExplorerModel {
 	 * was an error processing the request, it will return null.
 	 */
 	public static Object[][] retrieveOwnedApplications (long steamId, Object[] options) {
-		String commandString = "select ownedApplication.appId, ownedApplication.steamId, application.appName, player.personaName";
+		String commandString = "select ownedApplication.appId, application.appName, ownedApplication.steamId, player.personaName";
 		commandString += " from ownedApplication";
 		commandString += " join application on ownedApplication.appId = application.appId";
 		commandString += " join player on ownedApplication.steamId = player.steamId";

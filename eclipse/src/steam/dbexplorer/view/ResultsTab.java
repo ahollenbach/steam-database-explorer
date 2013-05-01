@@ -18,13 +18,15 @@ import steam.dbexplorer.controller.ExplorerController;
 public class ResultsTab extends JPanel {
 	private ExplorerController controller;
 	private QueryTab queryTab;
+	private JTabbedPane parent;
 	
 	private JTable results;
 	private JScrollPane scrollPane;
 	
-	public ResultsTab(ExplorerController controller) {
+	public ResultsTab(JTabbedPane parent, ExplorerController controller) {
 		super();
 		this.controller = controller;
+		this.parent = parent;
 		this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 		
 		initializeTable();

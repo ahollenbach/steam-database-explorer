@@ -28,10 +28,12 @@ public class QueryTab extends JPanel {
 	JPanel selectionPanel;
 	private ExplorerController controller;
 	private ResultsTab resultsTab;
+	private JTabbedPane parent;
 	
-	public QueryTab(ExplorerController controller) {
+	public QueryTab(JTabbedPane parentPane, ExplorerController controller) {
 		super();
 		this.controller = controller;
+		this.parent = parentPane;
 		this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 		
 		JPanel pickTable = createPickTable();
@@ -49,7 +51,7 @@ public class QueryTab extends JPanel {
             public void actionPerformed(ActionEvent ae) {
             	String table = (String) currentTableName.getSelectedItem();
             	resultsTab.updateTable(table);
-            	//.setSelectedIndex(0);
+            	parent.setSelectedIndex(1);
             }
         });	
 		
