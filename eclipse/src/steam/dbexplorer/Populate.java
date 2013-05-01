@@ -85,7 +85,7 @@ public class Populate {
 				String selectPlayerString = "select count(steamId) as playerExists from player where steamId = ?;";
 				PreparedStatement selectPlayerStatement = con.prepareStatement(selectPlayerString);
 				
-				String insertPlayerString = "insert into player values (?, ?, ?, ?, ?, ?);";
+				String insertPlayerString = "insert into player values (?, ?, ?, ?, ?);";
 				PreparedStatement insertPlayerStatement = con.prepareStatement(insertPlayerString);
 				
 				String insertAppString = "insert into OwnedApplication values (?, ?);";
@@ -125,7 +125,6 @@ public class Populate {
 					else {
 						insertPlayerStatement.setDate(5, null);
 					}
-					insertPlayerStatement.setDate(6,null);
 					insertPlayerStatement.execute();
 					
 					try {
@@ -296,7 +295,8 @@ public class Populate {
 			
 			populateAchievements(con, appsAdded);
 			
-			populatePlayers(0,con,76561197988083973L, appsAdded);
+			populatePlayers(0, con, 76561198049281288L, appsAdded);
+			//populatePlayers(0,con,76561197988083973L, appsAdded);
 			//76561197988083973  -  Tonbo
 			//76561197988128323  -  WispingWinds
 			//76561198018660341  -  DROCK
