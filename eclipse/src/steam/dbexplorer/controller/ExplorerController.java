@@ -10,11 +10,11 @@
 package steam.dbexplorer.controller;
 
 import java.util.HashMap;
+
+import steam.dbexplorer.SystemCode;
 import steam.dbexplorer.model.ExplorerModel;
 
 public class ExplorerController {
-	
-	//TODO populate tableLabels with proper values
 	private static HashMap<String, String[]> tableLabels;
 	
 	public static final String[] tableNames = {"Achievements", 
@@ -33,6 +33,14 @@ public class ExplorerController {
 											  "not equal to",
 											  "greater than or equal to",
 											  "greater than"};
+
+	public static final String[] opEquivs = {"<",
+											 "<=",
+											 "==",
+											 "<>",
+											 ">=",
+											 ">"};
+	
 	/** 
 	 * A string value of the last entity type to be fetched. Might be 
 	 * deprecated.
@@ -40,6 +48,7 @@ public class ExplorerController {
 	private String currentTable;
 	
 	public ExplorerController() {
+		// populate tableLabels
 		tableLabels = new HashMap<String, String[]>();
 		String[][] labels = {{"Application ID", "Application Name", "Achievement Name"}, //Achievements
 							 {"Application ID", "Application Name"}, //Applications
@@ -50,6 +59,8 @@ public class ExplorerController {
 		for(int i=0;i<tableNames.length;i++) {
 			tableLabels.put(tableNames[i], labels[i]);
 		}
+		
+		
 	}
 	
 	public Object[][] getData(String tableName, String[] options) {
@@ -86,36 +97,26 @@ public class ExplorerController {
 	 * @param entityName The name of the entity to create.
 	 * @return
 	 */
-	public boolean createEntry(String entityName, String[] values) {
-		//TODO this is not actually working code.
-		//Has to verify values are parsable i.e. values[0] = "fdfjk234444444"
-		Object[] valuesConvertedToObjects = values;
-		ExplorerModel.createEntity(entityName,valuesConvertedToObjects);
-		return false;
-	}
-
-	/**
-	 * Gets the attributes for a given table
-	 * 
-	 * @param tableName the table to fetch the attributes of
-	 * @return a list of attributes associated with the given table
-	 */
-	public String[] getAttr(String tableName) {
-		String[] attributes = {"steamID",
-							   "personaName",
-							   "profileURL",
-							   "lastLogoff",
-							   "realName",
-							   "timeCreated"};
-		return attributes;
+	public SystemCode createEntry(String entityName, String[] values) {
+		int numAttr = tableLabels.get(entityName).length;
+		if(numAttr > values.length) {
+			String[] valsWithNullStrings = new String[numAttr];
+			for(int i=0;i<values.length;i++) {
+				valsWithNullStrings[i] = values[i]; 
+			}
+		}
+		return ExplorerModel.createEntity(entityName,values);
 	}
 	
-	/* TODO make these functions
-	public boolean delete*(String entityName, String[] values) {
-		return false;
+	public SystemCode deleteEntity(String entityName, String[] values) {
+		// should not matter if you send all the values or just the primary
+		// keys.
+		return ExplorerModel.deleteEntity(entityName, values);
 	}
 	
-	public boolean update*(String entityName, String[] values) {
-		return false;
-	} */
+	public SystemCode updateEntity(String entityName, String[] values) {
+		// should not matter if you send all the values or just the primary
+		// keys.
+		return ExplorerModel.updateEntity(entityName, values);
+	}
 }
