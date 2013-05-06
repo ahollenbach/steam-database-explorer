@@ -58,6 +58,7 @@ class AddEditDialog extends JDialog {
 			public void actionPerformed(ActionEvent ae) {
 				String[] keys = new String[inputs.size()];
 				String[] results = new String[inputs.size()];
+				//for putting into jtable with no quotes
 				String[] displayResults = new String[inputs.size()];
 				keys = inputs.keySet().toArray(keys);
 				for(int i=0;i<keys.length;i++) {
@@ -67,16 +68,17 @@ class AddEditDialog extends JDialog {
 					if(val.length() == 0) {
 						val = null;
 					} else if("string".equals(ExplorerController.getAttrType(attrName)) && val != null ) {
-						//tmp = "'" + val + "'";
+						tmp = val;
 						val = "'" + val + "'";
 					}
 					results[i] = val;
+					displayResults[i] = tmp;
 					//int idx = getIndex(attrName);
 					//displayResults[idx] = tmp;
 					//results[idx] = val;
 				}
 				
-				motherFrame.addElemToTable(currentTable,results);
+				motherFrame.addElemToTable(currentTable,displayResults);
 				//motherFrame.addElemToTable(currentTable,displayResults);
 				ExplorerController.createEntry(currentTable, results);
 				AddEditDialog.this.dispose();
