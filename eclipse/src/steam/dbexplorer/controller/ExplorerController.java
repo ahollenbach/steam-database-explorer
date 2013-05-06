@@ -134,21 +134,23 @@ public class ExplorerController {
 		return SystemCode.FAILURE;*/
 		entityName = entityName.substring(0, entityName.length()-1); //remove s
 		entityName = entityName.replace(" ", ""); //remove space
-		if(entityName == null) {
-		} else if(entityName.equals("Achievement")) {
-			return deleteEntity(entityName,DBReference.AchievementPk,json,DBReference.AchievementTables);
-		} else if(entityName.equals("Application")) {
-			return deleteEntity(entityName,DBReference.ApplicationPk,json,DBReference.ApplicationTables);
-		} else if(entityName.equals("Friend")) {
-			return deleteEntity(entityName,DBReference.FriendPk,json,DBReference.FriendTables);
-		} else if(entityName.equals("OwnedAchievement")) {
-			return deleteEntity(entityName,DBReference.OwnedAchievementPk,json,DBReference.OwnedAchievementTables);
-		} else if(entityName.equals("OwnedApplication")) {
-			return deleteEntity(entityName,DBReference.OwnedApplicationPk,json,DBReference.OwnedApplicationTables);
-		} else if(entityName.equals("Player")) {
-			return deleteEntity(entityName,DBReference.PlayerPk,json,DBReference.PlayerTables);
+		String[] attr = DBReference.primaryKeys.get(entityName);
+		String usingTables = DBReference.usingTables.get(entityName);
+		
+		try {
+			int numAttr = attr.length;
+			String[] values = new String[attr.length];
+			for(int i=0;i<numAttr;i++) {
+				String val = json.getString(attr[i]);
+				if("string".equals(getAttrType(attr[i]))){
+            		val = "\'" + val + "\'";
+            	}
+				values[i] = convertToDbAttr(attr[i]) + "=" + val;
+			}
+			return ExplorerModel.deleteEntity(entityName, values,usingTables);
+		} catch(JSONException ex) {
+			return SystemCode.FAILURE;
 		}
-		return SystemCode.FAILURE;
 	}
 
 	/**
@@ -158,6 +160,7 @@ public class ExplorerController {
 	 * @param json A JSONObject containing all the achievement values
 	 * @return Whether the operation was successful or not
 	 */
+	@Deprecated
 	public SystemCode deleteEntity(String entityName, String[] attr, JSONObject json, String usingTables) {
 		try {
 			int numAttr = attr.length;
@@ -176,21 +179,26 @@ public class ExplorerController {
 	}
 	
 	public SystemCode updateEntity(String entityName, JSONObject json) {
-		if(entityName == null) {
-		} else if(entityName.equals("Achievements")) {
-			return updateEntity(entityName,DBReference.AchievementDisp,json);
-		} else if(entityName.equals("Applications")) {
-			return updateEntity(entityName,DBReference.ApplicationDisp,json);
-		} else if(entityName.equals("Friends")) {
-			return updateEntity(entityName,DBReference.FriendDisp,json);
-		} else if(entityName.equals("Owned Achievements")) {
-			return updateEntity(entityName,DBReference.OwnedAchievementDisp,json);
-		} else if(entityName.equals("Owned Applications")) {
-			return updateEntity(entityName,DBReference.OwnedApplicationDisp,json);
-		} else if(entityName.equals("Players")) {
-			return updateEntity(entityName,DBReference.PlayerDisp,json);
+		entityName = entityName.substring(0, entityName.length()-1); //remove s
+		entityName = entityName.replace(" ", ""); //remove space
+		String[] attr = DBReference.displayNames.get(entityName);
+		String[] pKeys = DBReference.primaryKeys.get(entityName);
+		String usingTables = DBReference.usingTables.get(entityName);
+		
+		try {
+			int numAttr = attr.length;
+			String[] values = new String[attr.length];
+			for(int i=0;i<numAttr;i++) {
+				String val = json.getString(attr[i]);
+				if("string".equals(getAttrType(attr[i]))){
+            		val = "\'" + val + "\'";
+            	}
+				values[i] = convertToDbAttr(attr[i]) + "=" + val;
+			}
+			return ExplorerModel.updateEntity(entityName, values);
+		} catch(JSONException ex) {
+			return SystemCode.FAILURE;
 		}
-		return SystemCode.FAILURE;
 	}
 	
 	/**
@@ -200,12 +208,17 @@ public class ExplorerController {
 	 * @param json A JSONObject containing all the achievement values
 	 * @return Whether the operation was successful or not
 	 */
+	@Deprecated
 	public SystemCode updateEntity(String entityName, String[] attr, JSONObject json) {
 		try {
 			int numAttr = attr.length;
 			String[] values = new String[attr.length];
 			for(int i=0;i<numAttr;i++) {
-				values[i] = json.getString(attr[i]);
+				String val = json.getString(attr[i]);
+				if("string".equals(getAttrType(attr[i]))){
+            		val = "\'" + val + "\'";
+            	}
+				values[i] = convertToDbAttr(attr[i]) + "=" + val;
 			}
 			return ExplorerModel.updateEntity(entityName, values);
 		} catch(JSONException ex) {

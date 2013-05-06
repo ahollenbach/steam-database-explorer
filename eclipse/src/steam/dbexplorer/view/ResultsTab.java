@@ -16,6 +16,8 @@ import java.util.Collections;
 import java.util.Enumeration;
 
 import javax.swing.*;
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
 
 import org.json.JSONArray;
@@ -34,6 +36,7 @@ public class ResultsTab extends JPanel {
 	private JScrollPane scrollPane;
 	
 	private String currentTable;
+	private ArrayList<Integer> rowsChanged = new ArrayList<Integer>();
 	
 	public ResultsTab(JTabbedPane parent, ExplorerController controller) {
 		super();
@@ -65,14 +68,20 @@ public class ResultsTab extends JPanel {
 		currentTable = tableName;
 		
 		DefaultTableModel tableModel = new DefaultTableModel(data,labels) {
-			   @Override
-			   public boolean isCellEditable(int row, int column) {
-				    if(DBReference.containsPK(currentTable, this.getColumnName(column))) {
-				    	return false;
-				    }
-				    return true;
-			   }
-			};
+		   @Override
+		   public boolean isCellEditable(int row, int column) {
+			    if(DBReference.containsPK(currentTable, this.getColumnName(column))) {
+			    	return false;
+			    }
+			    return true;
+		   }
+		};
+		tableModel.addTableModelListener(new TableModelListener() {
+			@Override
+			public void tableChanged(TableModelEvent event) {
+				rowsChanged.add(event.getFirstRow());
+			}
+		});
 		results.setModel(tableModel);
 	}
 
@@ -88,7 +97,22 @@ public class ResultsTab extends JPanel {
         });
 		p.add(add);
 		JButton update = new JButton("Update entries");
-		update.setEnabled(false);
+		//update.setEnabled(true);
+		update.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent ae) {
+            	try {
+            		JSONObject json = new JSONObject();
+	            	for(int row : rowsChanged) {
+	            		for(int col=0;col<results.getColumnCount();col++) {
+		                	json.put(results.getColumnName(col), 
+		                			 results.getValueAt(row, col));
+		            	}
+	            	}
+	            	controller.updateEntity(currentTable, json);
+            	} catch(JSONException e) {
+	            }
+            }
+        });
 		p.add(update);
 		JButton delete = new JButton("Remove " + addDeleteWhat);
 		//delete.setEnabled(false);
@@ -114,4 +138,13 @@ public class ResultsTab extends JPanel {
 	public void setQueryPanelRef(QueryTab queryPanel) {
 		this.queryTab = queryPanel;
 	}
+	
+	public class Tuple<X,Y> { 
+		public final int row; 
+		public final int col; 
+		public Tuple(int row,int col) { 
+			this.row = row; 
+			this.col = col; 
+		} 
+	} 
 }

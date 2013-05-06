@@ -8,38 +8,51 @@
 
 package steam.dbexplorer.dbobject;
 
+import java.util.HashMap;
+
 public class DBReference {
-	public static final String[] PlayerDisp = {"Steam ID", "Persona Name", "Profile URL", "Real Name", "Date Joined"};
-	public static final String[] FriendDisp = {"Steam ID #1", "Steam ID #2"};
-	public static final String[] ApplicationDisp = {"Application ID", "Application Name"};
-	public static final String[] AchievementDisp = {"Application ID", "Achievement Name"};
-	public static final String[] OwnedAchievementDisp = {"Application ID", "Achievement Name", "Steam ID"};
-	public static final String[] OwnedApplicationDisp = {"Application ID", "Steam ID"};
+	public static HashMap<String, String[]> displayNames = new HashMap<String, String[]>();
+	/** Hopefully this pointless hashmap won't be around for long */
+	public static HashMap<String, String[]> editableValues = new HashMap<String, String[]>();
+	public static HashMap<String, String[]> primaryKeys = new HashMap<String, String[]>();
+	public static HashMap<String, String> usingTables = new HashMap<String, String>();
 	
-	//primary keys
-	public static final String[] PlayerPk = {"Steam ID"};
-	public static final String[] FriendPk = {"Steam ID #1", "Steam ID #2"};
-	public static final String[] ApplicationPk = {"Application ID"};
-	public static final String[] AchievementPk = {"Application ID", "Achievement Name"};
-	public static final String[] OwnedAchievementPk = {"Application ID", "Achievement Name", "Steam ID"};
-	public static final String[] OwnedApplicationPk = {"Application ID", "Steam ID"};
+	static {
+		displayNames.put("Player", new String[] {"Steam ID", "Persona Name", "Profile URL", "Real Name", "Date Joined"});
+		displayNames.put("Friend", new String[] {"Steam ID #1", "Steam ID #2"});
+		displayNames.put("Application", new String[] {"Application ID", "Application Name"});
+		displayNames.put("Achievement", new String[] {"Application ID", "Achievement Name"});
+		displayNames.put("OwnedAchievement", new String[] {"Application ID", "Achievement Name", "Steam ID"});
+		displayNames.put("OwnedApplication", new String[] {"Application ID", "Steam ID"});
+		
+		editableValues.put("Player", new String[] {"Persona Name", "Profile URL", "Real Name", "Date Joined"});
+		editableValues.put("Friend", new String[] {});
+		editableValues.put("Application", new String[] {"Application Name"});
+		editableValues.put("Achievement", new String[] {});
+		editableValues.put("OwnedAchievement", new String[] {});
+		editableValues.put("OwnedApplication", new String[] {});
+		
+		primaryKeys.put("Player", new String[] {"Steam ID"});
+		primaryKeys.put("Friend", new String[] {"Steam ID #1", "Steam ID #2"});
+		primaryKeys.put("Application", new String[] {"Application ID"});
+		primaryKeys.put("Achievement", new String[] {"Application ID", "Achievement Name"});
+		primaryKeys.put("OwnedAchievement", new String[] {"Application ID", "Achievement Name", "Steam ID"});
+		primaryKeys.put("OwnedApplication", new String[] {"Application ID", "Steam ID"});
+		
+		usingTables.put("Player", "");
+		usingTables.put("Friend", "Player");
+		usingTables.put("Application", "");
+		usingTables.put("Achievement", "Application");
+		usingTables.put("OwnedAchievement", "Application,Player");
+		usingTables.put("OwnedApplication", "Application,Player");
+	}
 	
 	public static Boolean containsPK(String tableName,String attrName) {
 		if(tableName == null) {
-		} else if(tableName.equals("Achievements")) {
-			return contains(AchievementPk, attrName);
-		} else if(tableName.equals("Applications")) {
-			return contains(ApplicationPk, attrName);
-		} else if(tableName.equals("Friends")) {
-			return contains(FriendPk, attrName);
-		} else if(tableName.equals("Owned Achievements")) {
-			return contains(OwnedAchievementPk, attrName);
-		} else if(tableName.equals("Owned Applications")) {
-			return contains(OwnedApplicationPk, attrName);
-		} else if(tableName.equals("Players")) {
-			return contains(PlayerPk, attrName);
+			return false;
+		} else {
+			return contains(primaryKeys.get(tableName), attrName);
 		}
-		return false;
 	}
 	
 	private static Boolean contains(String[] values, String value) {
@@ -48,12 +61,4 @@ public class DBReference {
 		}
 		return false;
 	}
-	
-	//for a "using" clause
-	public static final String PlayerTables = "";
-	public static final String FriendTables = "Player";
-	public static final String ApplicationTables = "";
-	public static final String AchievementTables = "Application";
-	public static final String OwnedAchievementTables = "Application,Player";
-	public static final String OwnedApplicationTables = "Application,Player";
 }
