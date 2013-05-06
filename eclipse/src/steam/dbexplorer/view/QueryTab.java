@@ -16,6 +16,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Dictionary;
 import java.util.Hashtable;
 
@@ -239,9 +240,14 @@ public class QueryTab extends JPanel {
 		delete.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent ae) {
             	String selectedValue = (String) constraintsList.getSelectedValue();
+            	System.out.println(selectedValue);
+            	System.out.println(currentConstraints.values());
+            	currentConstraints.values().removeAll(Collections.singleton(selectedValue));
+            	updateConstraints();
+        		constraintsList.validate();
             }
         });
-		delete.setEnabled(false); //TODO:Get Remove working
+		
 		p.add(delete);
 		JButton clear = new JButton("Clear " + addDeleteWhat + "s");
 		clear.addActionListener(new ActionListener() {
