@@ -24,6 +24,31 @@ public class DBReference {
 	public static final String[] OwnedAchievementPk = {"Application ID", "Achievement Name", "Steam ID"};
 	public static final String[] OwnedApplicationPk = {"Application ID", "Steam ID"};
 	
+	public static Boolean containsPK(String tableName,String attrName) {
+		if(tableName == null) {
+		} else if(tableName.equals("Achievements")) {
+			return contains(AchievementPk, attrName);
+		} else if(tableName.equals("Applications")) {
+			return contains(ApplicationPk, attrName);
+		} else if(tableName.equals("Friends")) {
+			return contains(FriendPk, attrName);
+		} else if(tableName.equals("Owned Achievements")) {
+			return contains(OwnedAchievementPk, attrName);
+		} else if(tableName.equals("Owned Applications")) {
+			return contains(OwnedApplicationPk, attrName);
+		} else if(tableName.equals("Players")) {
+			return contains(PlayerPk, attrName);
+		}
+		return false;
+	}
+	
+	private static Boolean contains(String[] values, String value) {
+		for(int i=0;i<values.length;i++) {
+			if(value.equals(values[i])) return true;
+		}
+		return false;
+	}
+	
 	//for a "using" clause
 	public static final String PlayerTables = "";
 	public static final String FriendTables = "Player";

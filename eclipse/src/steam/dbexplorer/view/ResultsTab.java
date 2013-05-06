@@ -23,6 +23,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import steam.dbexplorer.controller.ExplorerController;
+import steam.dbexplorer.dbobject.DBReference;
 
 public class ResultsTab extends JPanel {
 	private ExplorerController controller;
@@ -61,8 +62,18 @@ public class ResultsTab extends JPanel {
 		constraints = constraintsAL.toArray(constraints);
 		Object[][] data = controller.getData(tableName,constraints);
 		String[] labels = controller.getLabels(tableName);
-		results.setModel(new DefaultTableModel(data,labels));
 		currentTable = tableName;
+		
+		DefaultTableModel tableModel = new DefaultTableModel(data,labels) {
+			   @Override
+			   public boolean isCellEditable(int row, int column) {
+				    if(DBReference.containsPK(currentTable, this.getColumnName(column))) {
+				    	return false;
+				    }
+				    return true;
+			   }
+			};
+		results.setModel(tableModel);
 	}
 
 	private JPanel createCUDPanel(String addDeleteWhat) {

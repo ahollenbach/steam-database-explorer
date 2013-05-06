@@ -132,20 +132,20 @@ public class ExplorerController {
 		} catch (JSONException e) {
 		}
 		return SystemCode.FAILURE;*/
-		//entityName = entityName.substring(0, entityName.length()-1); //remove s
-		//entityName = entityName.replace(" ", ""); //remove space
+		entityName = entityName.substring(0, entityName.length()-1); //remove s
+		entityName = entityName.replace(" ", ""); //remove space
 		if(entityName == null) {
-		} else if(entityName.equals("Achievements")) {
+		} else if(entityName.equals("Achievement")) {
 			return deleteEntity(entityName,DBReference.AchievementPk,json,DBReference.AchievementTables);
-		} else if(entityName.equals("Applications")) {
+		} else if(entityName.equals("Application")) {
 			return deleteEntity(entityName,DBReference.ApplicationPk,json,DBReference.ApplicationTables);
-		} else if(entityName.equals("Friends")) {
+		} else if(entityName.equals("Friend")) {
 			return deleteEntity(entityName,DBReference.FriendPk,json,DBReference.FriendTables);
-		} else if(entityName.equals("Owned Achievements")) {
+		} else if(entityName.equals("OwnedAchievement")) {
 			return deleteEntity(entityName,DBReference.OwnedAchievementPk,json,DBReference.OwnedAchievementTables);
-		} else if(entityName.equals("Owned Applications")) {
+		} else if(entityName.equals("OwnedApplication")) {
 			return deleteEntity(entityName,DBReference.OwnedApplicationPk,json,DBReference.OwnedApplicationTables);
-		} else if(entityName.equals("Players")) {
+		} else if(entityName.equals("Player")) {
 			return deleteEntity(entityName,DBReference.PlayerPk,json,DBReference.PlayerTables);
 		}
 		return SystemCode.FAILURE;

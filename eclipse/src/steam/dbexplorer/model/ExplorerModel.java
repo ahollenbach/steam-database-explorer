@@ -359,9 +359,10 @@ public class ExplorerModel {
 	 */
 	public static SystemCode deleteEntity (String entityName, Object[] primaryKeys, String usingTables) {
 		String deleteString = "delete from ? ";
+		/*
 		if(usingTables.length() > 0) {
 			deleteString += "using ? ";
-		}
+		}*/
 		deleteString +=  "where";
 		for(int i = 0; i < primaryKeys.length; i++) {
 			if ( i != 0 ) {
@@ -374,10 +375,11 @@ public class ExplorerModel {
 			PreparedStatement deleteStatement = con.prepareStatement(deleteString);
 			deleteStatement.setString(1, entityName);
 			int offset = 2;
+			/*
 			if(usingTables.length() > 0) {
 				deleteStatement.setString(2, usingTables);
 				offset = 3;
-			}
+			}*/
 			for(int i = 0; i < primaryKeys.length; i++) {
 				deleteStatement.setObject(i+offset, primaryKeys[i]);
 			}
