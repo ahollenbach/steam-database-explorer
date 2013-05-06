@@ -10,6 +10,7 @@
 package steam.dbexplorer.controller;
 
 import java.io.StringWriter;
+import java.io.ObjectInputStream.GetField;
 import java.util.HashMap;
 
 import org.json.JSONArray;
@@ -193,7 +194,7 @@ public class ExplorerController {
 				if("string".equals(getAttrType(attr[i]))){
             		val = "\'" + val + "\'";
             	}
-				values[i] = convertToDbAttr(attr[i]) + "=" + val;
+				values[i] = dbAttrNoPrefix(attr[i]) + "=" + val;
 			}
 			String[] keys = new String[attr.length];
 			for(int i=0;i<pKeys.length;i++) {
@@ -201,7 +202,7 @@ public class ExplorerController {
 				if("string".equals(getAttrType(pKeys[i]))){
             		val = "\'" + val + "\'";
             	}
-				keys[i] = convertToDbAttr(pKeys[i]) + "=" + val;
+				keys[i] = dbAttrNoPrefix(pKeys[i]) + "=" + val;
 			}
 			return ExplorerModel.updateEntity(entityName, values, keys);
 		} catch(JSONException ex) {
@@ -226,6 +227,23 @@ public class ExplorerController {
 		return values.get(orig);
 	}
 	
+	public static String dbAttrNoPrefix(String orig) {
+		//SO YUCKY GET RID OF THIS
+		HashMap<String, String> values = new HashMap<String, String>();
+		values.put("Steam ID", "steamId");
+		values.put("Persona Name", "personaName");
+		values.put("Profile URL", "profileUrl");
+		values.put("Real Name", "realName");
+		values.put("Application ID", "appId");
+		values.put("Date Joined", "timeCreated");
+		values.put("Steam ID #1", "steamId1");
+		values.put("Steam ID #2", "steamId2");
+		values.put("Application Name", "appName");
+		values.put("Achievement Name", "achievementName");
+		
+		return values.get(orig);
+	}
+	
 	public static String getAttrType(String orig) {
 		//SO YUCKY GET RID OF THIS TOO
 		HashMap<String, String> values = new HashMap<String, String>();
@@ -241,5 +259,9 @@ public class ExplorerController {
 		values.put("Achievement Name", "string");
 		
 		return values.get(orig);
+	}
+	
+	public String getCurrentTable() {
+		return currentTable;
 	}
 }

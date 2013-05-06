@@ -96,6 +96,10 @@ public class ResultsTab extends JPanel {
 		JButton add = new JButton("Add new " + addDeleteWhat);
 		add.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent ae) {
+            	String tableName = controller.getCurrentTable();
+            	tableName = tableName.substring(0, tableName.length()-1); //remove s
+    			tableName = tableName.replace(" ", ""); //remove spaces 
+            	new AddEditDialog(new JFrame(),tableName);
             	DefaultTableModel model = (DefaultTableModel) results.getModel();
             	Object[] values = {};
             	model.addRow(values);
