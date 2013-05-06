@@ -327,16 +327,29 @@ public class ExplorerModel {
 		for(int i = 0; i < values.length; i++) {
 			if ( i != 0 ) {
 				updateString += " , ";
+				
+				
 			}
-			updateString += " " +values[i];
+			//TODO OH GOD FIX THIS
+			System.out.println(values[i].toString().substring(0, 11));
+			if (values[i].toString().substring(0, 11).equals("timeCreated")) {
+				String temp = values[i].toString();
+				temp = temp.replaceFirst("=", "='");
+				temp = temp.concat("'");
+				updateString += " " + temp;
+			} else {
+				updateString += " " + values[i];
+			}
 		}
 		if (keys.length > 0) {
 			updateString += " where ";
 			for(int i = 0; i < keys.length; i++) {
-				if ( i != 0 ) {
-					updateString += " and ";
+				if (keys[i] != null) {
+					if ( i != 0 ) {
+						updateString += " and ";
+					}
+					updateString += keys[i];
 				}
-				updateString += keys[i];
 			}
 		}
 		updateString += ";";
