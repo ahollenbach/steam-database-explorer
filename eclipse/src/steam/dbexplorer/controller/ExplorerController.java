@@ -9,9 +9,15 @@
 
 package steam.dbexplorer.controller;
 
+import java.io.StringWriter;
 import java.util.HashMap;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import steam.dbexplorer.SystemCode;
+import steam.dbexplorer.dbobject.DBReference;
 import steam.dbexplorer.model.ExplorerModel;
 
 public class ExplorerController {
@@ -40,6 +46,8 @@ public class ExplorerController {
 											 "<>",
 											 ">=",
 											 ">"};
+	
+	public static final String[] stringOps = {"contains","equals"};
 	
 	/** 
 	 * A string value of the last entity type to be fetched. Might be 
@@ -108,15 +116,111 @@ public class ExplorerController {
 		return ExplorerModel.createEntity(entityName,values);
 	}
 	
-	public SystemCode deleteEntity(String entityName, String[] values) {
-		// should not matter if you send all the values or just the primary
-		// keys.
-		return ExplorerModel.deleteEntity(entityName, values);
+	public SystemCode deleteEntity(String entityName, JSONObject json) {
+		/*
+		try {
+			String[] values = new String[json.length()];
+			String[] names = JSONObject.getNames(json);
+			
+			for(int i=0; i<json.length();i++) {
+				String val = json.getString(names[i]);
+				values[i] = convertToDbAttr(names[i]) + "=" + val;
+			}
+			return ExplorerModel.deleteEntity(entityName, values);
+		} catch (JSONException e) {
+		}
+		return SystemCode.FAILURE;*/
+		//entityName = entityName.substring(0, entityName.length()-1); //remove s
+		//entityName = entityName.replace(" ", ""); //remove space
+		if(entityName == null) {
+		} else if(entityName.equals("Achievements")) {
+			return deleteEntity(entityName,DBReference.AchievementDisp,json);
+		} else if(entityName.equals("Applications")) {
+			return deleteEntity(entityName,DBReference.ApplicationDisp,json);
+		} else if(entityName.equals("Friends")) {
+			return deleteEntity(entityName,DBReference.FriendDisp,json);
+		} else if(entityName.equals("Owned Achievements")) {
+			return deleteEntity(entityName,DBReference.OwnedAchievementDisp,json);
+		} else if(entityName.equals("Owned Applications")) {
+			return deleteEntity(entityName,DBReference.OwnedApplicationDisp,json);
+		} else if(entityName.equals("Players")) {
+			return deleteEntity(entityName,DBReference.PlayerDisp,json);
+		}
+		return SystemCode.FAILURE;
 	}
 	
-	public SystemCode updateEntity(String entityName, String[] values) {
-		// should not matter if you send all the values or just the primary
-		// keys.
-		return ExplorerModel.updateEntity(entityName, values);
+	/**
+	 * Sends a command to the explorer model to delete the entity. Ensures
+	 * the values are in the proper order.
+	 * 
+	 * @param json A JSONObject containing all the achievement values
+	 * @return Whether the operation was successful or not
+	 */
+	public SystemCode deleteEntity(String entityName, String[] attr, JSONObject json) {
+		try {
+			int numAttr = attr.length;
+			String[] values = new String[attr.length];
+			for(int i=0;i<numAttr;i++) {
+				values[i] = json.getString(attr[i]);
+			}
+			return ExplorerModel.deleteEntity(entityName, values);
+		} catch(JSONException ex) {
+			return SystemCode.FAILURE;
+		}
+	}
+	
+	public SystemCode updateEntity(String entityName, JSONObject json) {
+		if(entityName == null) {
+		} else if(entityName.equals("Achievements")) {
+			return updateEntity(entityName,DBReference.AchievementDisp,json);
+		} else if(entityName.equals("Applications")) {
+			return updateEntity(entityName,DBReference.ApplicationDisp,json);
+		} else if(entityName.equals("Friends")) {
+			return updateEntity(entityName,DBReference.FriendDisp,json);
+		} else if(entityName.equals("Owned Achievements")) {
+			return updateEntity(entityName,DBReference.OwnedAchievementDisp,json);
+		} else if(entityName.equals("Owned Applications")) {
+			return updateEntity(entityName,DBReference.OwnedApplicationDisp,json);
+		} else if(entityName.equals("Players")) {
+			return updateEntity(entityName,DBReference.PlayerDisp,json);
+		}
+		return SystemCode.FAILURE;
+	}
+	
+	/**
+	 * Sends a command to the explorer model to delete the entity. Ensures
+	 * the values are in the proper order.
+	 * 
+	 * @param json A JSONObject containing all the achievement values
+	 * @return Whether the operation was successful or not
+	 */
+	public SystemCode updateEntity(String entityName, String[] attr, JSONObject json) {
+		try {
+			int numAttr = attr.length;
+			String[] values = new String[attr.length];
+			for(int i=0;i<numAttr;i++) {
+				values[i] = json.getString(attr[i]);
+			}
+			return ExplorerModel.updateEntity(entityName, values);
+		} catch(JSONException ex) {
+			return SystemCode.FAILURE;
+		}
+	}
+	
+	public static String convertToDbAttr(String orig) {
+		//SO YUCKY GET RID OF THIS
+		HashMap<String, String> values = new HashMap<String, String>();
+		values.put("Steam ID", "player.steamId");
+		values.put("Persona Name", "player.personaName");
+		values.put("Profile URL", "player.profileUrl");
+		values.put("Real Name", "player.realName");
+		values.put("Application ID", "application.appId");
+		values.put("Date Joined", "player.timeCreated");
+		values.put("Steam ID #1", "friend.steamId1");
+		values.put("Steam ID #2", "friend.steamId2");
+		values.put("Application Name", "application.appName");
+		values.put("Achievement Name", "achievement.achievementName");
+		
+		return values.get(orig);
 	}
 }
