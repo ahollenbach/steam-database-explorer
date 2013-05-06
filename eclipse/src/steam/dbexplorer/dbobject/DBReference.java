@@ -16,6 +16,14 @@ public class DBReference {
 	public static final String[] OwnedAchievementDisp = {"Application ID", "Achievement Name", "Steam ID"};
 	public static final String[] OwnedApplicationDisp = {"Application ID", "Steam ID"};
 	
+	//primary keys
+	public static final String[] PlayerPk = {"Steam ID"};
+	public static final String[] FriendPk = {"Steam ID #1", "Steam ID #2"};
+	public static final String[] ApplicationPk = {"Application ID"};
+	public static final String[] AchievementPk = {"Application ID", "Achievement Name"};
+	public static final String[] OwnedAchievementPk = {"Application ID", "Achievement Name", "Steam ID"};
+	public static final String[] OwnedApplicationPk = {"Application ID", "Steam ID"};
+	
 	//for a "using" clause
 	public static final String PlayerTables = "";
 	public static final String FriendTables = "Player";
