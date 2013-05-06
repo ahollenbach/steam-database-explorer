@@ -321,9 +321,6 @@ public class ExplorerModel {
 	 * @return A system code describing the success or failure of the operation.
 	 */
 	public static SystemCode updateEntity(String entityName, Object[] values) {
-		if (true)
-		return SystemCode.FAILURE;
-		
 		String updateString = "update ? set ";
 		for(int i = 0; i < values.length; i++) {
 			if ( i != 0 ) {
@@ -358,11 +355,44 @@ public class ExplorerModel {
 	 * @return A system code describing the success or failure of the operation.
 	 */
 	public static SystemCode deleteEntity (String entityName, Object[] primaryKeys, String usingTables) {
-		String deleteString = "delete from ? ";
-		/*
+		String deleteString = "delete from " + entityName;
 		if(usingTables.length() > 0) {
 			deleteString += "using ? ";
-		}*/
+		}
+		deleteString +=  " where ";
+		for(int i = 0; i < primaryKeys.length; i++) {
+			if ( i != 0 ) {
+				deleteString += " and ";
+			}
+			deleteString += primaryKeys[i];
+		}
+		deleteString += ";";
+		System.out.println(deleteString);
+		try {
+			PreparedStatement deleteStatement = con.prepareStatement(deleteString);
+			//deleteStatement.setObject(1, entityName);
+			//int offset = 2;
+			//if(usingTables.length() > 0) {
+			//	deleteStatement.setString(2, usingTables);
+			//	offset = 3;
+			//}
+			//for(int i = 0; i < primaryKeys.length; i++) {
+			//	System.out.println(primaryKeys[i].toString());
+			//	deleteStatement.setObject(i+offset, primaryKeys[i]);
+			//}
+			System.out.println(deleteStatement);
+			deleteStatement.execute();
+			return SystemCode.SUCCESS;
+		}
+		catch (SQLException e) {
+			e.printStackTrace();
+			return SystemCode.FAILURE;
+		}
+/*		
+		String deleteString = "delete from ? ";
+		if(usingTables.length() > 0) {
+			deleteString += "using ? ";
+		}
 		deleteString +=  "where";
 		for(int i = 0; i < primaryKeys.length; i++) {
 			if ( i != 0 ) {
@@ -373,14 +403,15 @@ public class ExplorerModel {
 		deleteString += ";";
 		try {
 			PreparedStatement deleteStatement = con.prepareStatement(deleteString);
-			deleteStatement.setString(1, entityName);
+			deleteStatement.setObject(1, entityName);
 			int offset = 2;
 			/*
 			if(usingTables.length() > 0) {
 				deleteStatement.setString(2, usingTables);
 				offset = 3;
-			}*/
+			}
 			for(int i = 0; i < primaryKeys.length; i++) {
+				System.out.println(primaryKeys[i].toString());
 				deleteStatement.setObject(i+offset, primaryKeys[i]);
 			}
 			System.out.println(deleteStatement);
@@ -390,7 +421,7 @@ public class ExplorerModel {
 		catch (SQLException e) {
 			e.printStackTrace();
 			return SystemCode.FAILURE;
-		}
+		} */
 	}
 
 	/**
