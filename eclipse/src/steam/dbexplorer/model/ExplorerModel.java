@@ -317,10 +317,12 @@ public class ExplorerModel {
 	 * entity to update.
 	 * 
 	 * @param entityName The type of object (Player, Friend, etc.)
-	 * @param values The values to update the table with.
+	 * @param values The values to update the table with. Does not contain
+	 * any primary keys.
+	 * @param keys A list of the primary keys and their values
 	 * @return A system code describing the success or failure of the operation.
 	 */
-	public static SystemCode updateEntity(String entityName, Object[] values) {
+	public static SystemCode updateEntity(String entityName, Object[] values, String[] keys) {
 		String updateString = "update ? set ";
 		for(int i = 0; i < values.length; i++) {
 			if ( i != 0 ) {
@@ -351,7 +353,7 @@ public class ExplorerModel {
 	 * 
 	 * @param entityName The type of object (Player, Friend, etc.)
 	 * @param primaryKeys The primary keys used to uniquely identify an object.
-	 * @param usingTables 
+	 * @param usingTables A list of tables that the entity uses, comma separated
 	 * @return A system code describing the success or failure of the operation.
 	 */
 	public static SystemCode deleteEntity (String entityName, Object[] primaryKeys, String usingTables) {
