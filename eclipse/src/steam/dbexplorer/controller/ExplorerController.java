@@ -181,7 +181,7 @@ public class ExplorerController {
 	public SystemCode updateEntity(String entityName, JSONObject json) {
 		entityName = entityName.substring(0, entityName.length()-1); //remove s
 		entityName = entityName.replace(" ", ""); //remove space
-		String[] attr = DBReference.displayNames.get(entityName);
+		String[] attr = DBReference.editableValues.get(entityName);
 		String[] pKeys = DBReference.primaryKeys.get(entityName);
 		String usingTables = DBReference.usingTables.get(entityName);
 		
@@ -195,32 +195,15 @@ public class ExplorerController {
             	}
 				values[i] = convertToDbAttr(attr[i]) + "=" + val;
 			}
-			return ExplorerModel.updateEntity(entityName, values);
-		} catch(JSONException ex) {
-			return SystemCode.FAILURE;
-		}
-	}
-	
-	/**
-	 * Sends a command to the explorer model to delete the entity. Ensures
-	 * the values are in the proper order.
-	 * 
-	 * @param json A JSONObject containing all the achievement values
-	 * @return Whether the operation was successful or not
-	 */
-	@Deprecated
-	public SystemCode updateEntity(String entityName, String[] attr, JSONObject json) {
-		try {
-			int numAttr = attr.length;
-			String[] values = new String[attr.length];
-			for(int i=0;i<numAttr;i++) {
-				String val = json.getString(attr[i]);
-				if("string".equals(getAttrType(attr[i]))){
+			String[] keys = new String[attr.length];
+			for(int i=0;i<pKeys.length;i++) {
+				String val = json.getString(pKeys[i]);
+				if("string".equals(getAttrType(pKeys[i]))){
             		val = "\'" + val + "\'";
             	}
-				values[i] = convertToDbAttr(attr[i]) + "=" + val;
+				keys[i] = convertToDbAttr(pKeys[i]) + "=" + val;
 			}
-			return ExplorerModel.updateEntity(entityName, values);
+			return ExplorerModel.updateEntity(entityName, values, keys);
 		} catch(JSONException ex) {
 			return SystemCode.FAILURE;
 		}

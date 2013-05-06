@@ -47,10 +47,12 @@ public class DBReference {
 		usingTables.put("OwnedApplication", "Application,Player");
 	}
 	
-	public static Boolean containsPK(String tableName,String attrName) {
+	public static Boolean isPK(String tableName,String attrName) {
 		if(tableName == null) {
 			return false;
 		} else {
+			tableName = tableName.substring(0, tableName.length()-1); //remove s
+			tableName = tableName.replace(" ", ""); //remove spaces 
 			return contains(primaryKeys.get(tableName), attrName);
 		}
 	}

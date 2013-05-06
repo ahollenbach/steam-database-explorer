@@ -37,6 +37,7 @@ public class ResultsTab extends JPanel {
 	
 	private String currentTable;
 	private ArrayList<Integer> rowsChanged = new ArrayList<Integer>();
+	private ArrayList<Integer> notEditableColumns = new ArrayList<Integer>();;
 	
 	public ResultsTab(JTabbedPane parent, ExplorerController controller) {
 		super();
@@ -67,13 +68,18 @@ public class ResultsTab extends JPanel {
 		String[] labels = controller.getLabels(tableName);
 		currentTable = tableName;
 		
+		//find out what columns are editable
+		notEditableColumns.clear();
+		for(int i=0;i<labels.length;i++) {
+			if(DBReference.isPK(currentTable, labels[i])) {
+				notEditableColumns.add(i);
+			}
+		}
+		
 		DefaultTableModel tableModel = new DefaultTableModel(data,labels) {
 		   @Override
 		   public boolean isCellEditable(int row, int column) {
-			    if(DBReference.containsPK(currentTable, this.getColumnName(column))) {
-			    	return false;
-			    }
-			    return true;
+			    return !notEditableColumns.contains(column);
 		   }
 		};
 		tableModel.addTableModelListener(new TableModelListener() {
