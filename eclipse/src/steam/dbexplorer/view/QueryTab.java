@@ -173,8 +173,6 @@ public class QueryTab extends JPanel {
             	currentConstraints.clear();
             	updateConstraints();
         		constraintsList.validate();
-        		//constraintsList.invalidate();
-        		//constraintsList.repaint();
             }
         });
 		//add listener on tablename change
@@ -238,10 +236,22 @@ public class QueryTab extends JPanel {
 		edit.setEnabled(false);
 		p.add(edit);
 		JButton delete = new JButton("Remove " + addDeleteWhat);
-		delete.setEnabled(false);
+		delete.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent ae) {
+            	String selectedValue = (String) constraintsList.getSelectedValue();
+            }
+        });
+		delete.setEnabled(false); //TODO:Get Remove working
 		p.add(delete);
 		JButton clear = new JButton("Clear " + addDeleteWhat + "s");
-		clear.setEnabled(false);
+		clear.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent ae) {
+            	//hacky way to do this
+            	currentConstraints.clear();
+            	updateConstraints();
+        		constraintsList.validate();
+            }
+        });
 		p.add(clear);
 		
 		return p;
