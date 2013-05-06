@@ -108,7 +108,7 @@ public class ExplorerController {
 	 * @param entityName The name of the entity to create.
 	 * @return
 	 */
-	public SystemCode createEntry(String entityName, String[] values) {
+	public static SystemCode createEntry(String entityName, String[] values) {
 		int numAttr = tableLabels.get(entityName).length;
 		if(numAttr > values.length) {
 			String[] valsWithNullStrings = new String[numAttr];
@@ -116,6 +116,9 @@ public class ExplorerController {
 				valsWithNullStrings[i] = values[i]; 
 			}
 		}
+		entityName = entityName.substring(0, entityName.length()-1); //remove s
+		entityName = entityName.replace(" ", ""); //remove spaces 
+		
 		return ExplorerModel.createEntity(entityName,values);
 	}
 	

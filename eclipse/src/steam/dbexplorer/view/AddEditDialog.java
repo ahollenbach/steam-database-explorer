@@ -20,25 +20,31 @@ import java.util.Set;
 class AddEditDialog extends JDialog {
     private JTextField textField;
     private String currentTable;
+    private String tableDbString;
  
     private String createStr = "Create";
     private String cancelStr = "Cancel";
     private HashMap<String, JTextField> inputs = new HashMap<String, JTextField>();
     
-    public AddEditDialog(JFrame parent, String tableName) {
+    public AddEditDialog(JFrame parent, final ResultsTab motherFrame, String tableName) {
     	super(parent, true);
     	JPanel main = new JPanel();
-    	currentTable = tableName;
     	main.setLayout(new BoxLayout(main, BoxLayout.Y_AXIS));
-    	main.setMinimumSize(new Dimension(400,400));
-    	String[] attr = DBReference.displayNames.get(tableName);
+    	
+    	currentTable = tableName;
+    	tableDbString = tableName;
+    	tableDbString = tableDbString.substring(0, tableDbString.length()-1); //remove s
+    	tableDbString = tableDbString.replace(" ", ""); //remove spaces 
+		
+		
+    	String[] attr = DBReference.displayNames.get(tableDbString);
     	for(int i=0;i<attr.length;i++) {
     		JPanel p = new JPanel();
     		JLabel label = new JLabel(attr[i]);
     		JTextField input = new JTextField(15);
     		p.add(label);
     		p.add(input);
-    		p.setMaximumSize(new Dimension(400,60));
+    		p.setMinimumSize(new Dimension(400,60));
     		main.add(p);
     		inputs.put(attr[i], input);
     	}
@@ -55,14 +61,14 @@ class AddEditDialog extends JDialog {
 				for(int i=0;i<keys.length;i++) {
 					String attrName = keys[i];
 					String val = inputs.get(attrName).getText();
-					if(val.length() > 0) {
+					if(val.length() == 0) {
 						val = null;
 					} else if("string".equals(ExplorerController.getAttrType(attrName)) && val != null ) {
 						val = "'" + val + "'";
 					}
 					results[i] = val;
 				}
-				
+				motherFrame.addElemToTable(currentTable,results);
 				ExplorerController.createEntry(currentTable, results);
 				AddEditDialog.this.dispose();
 			}
@@ -77,7 +83,9 @@ class AddEditDialog extends JDialog {
     	options.add(create);
     	options.add(cancel);
     	main.add(options);
+    	main.setMinimumSize(new Dimension(300,200));
     	this.add(main);
+    	this.setMinimumSize(new Dimension(300,200));
     	this.setVisible(true);
     }
 

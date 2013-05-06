@@ -83,6 +83,7 @@ public class ExplorerModel {
 			for(int i = 0; i < values.length; i++) {
 				createStatement.setObject(i+2, values[i]);
 			}
+			System.out.println(createStatement);
 			createStatement.execute();
 			return SystemCode.SUCCESS;
 		}

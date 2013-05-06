@@ -99,10 +99,7 @@ public class ResultsTab extends JPanel {
             	String tableName = controller.getCurrentTable();
             	tableName = tableName.substring(0, tableName.length()-1); //remove s
     			tableName = tableName.replace(" ", ""); //remove spaces 
-            	new AddEditDialog(new JFrame(),tableName);
-            	DefaultTableModel model = (DefaultTableModel) results.getModel();
-            	Object[] values = {};
-            	model.addRow(values);
+            	new AddEditDialog(new JFrame(), ResultsTab.this, currentTable);
             }
         });
 		p.add(add);
@@ -150,12 +147,8 @@ public class ResultsTab extends JPanel {
 		this.queryTab = queryPanel;
 	}
 	
-	public class Tuple<X,Y> { 
-		public final int row; 
-		public final int col; 
-		public Tuple(int row,int col) { 
-			this.row = row; 
-			this.col = col; 
-		} 
-	} 
+	public void addElemToTable(String tableName, String[] values) {
+		System.out.println("Adding new element");
+		((DefaultTableModel)results.getModel()).addRow(values);
+	}
 }
