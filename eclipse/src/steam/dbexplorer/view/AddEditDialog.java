@@ -15,6 +15,7 @@ import steam.dbexplorer.dbobject.DBReference;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Set;
  
 class AddEditDialog extends JDialog {
@@ -24,7 +25,7 @@ class AddEditDialog extends JDialog {
  
     private String createStr = "Create";
     private String cancelStr = "Cancel";
-    private HashMap<String, JTextField> inputs = new HashMap<String, JTextField>();
+    private LinkedHashMap<String, JTextField> inputs = new LinkedHashMap<String, JTextField>();
     
     public AddEditDialog(JFrame parent, final ResultsTab motherFrame, String tableName) {
     	super(parent, true);
@@ -66,14 +67,17 @@ class AddEditDialog extends JDialog {
 					if(val.length() == 0) {
 						val = null;
 					} else if("string".equals(ExplorerController.getAttrType(attrName)) && val != null ) {
-						tmp = "'" + val + "'";
+						//tmp = "'" + val + "'";
+						val = "'" + val + "'";
 					}
-					int idx = getIndex(attrName);
-					displayResults[idx] = tmp;
-					results[idx] = val;
+					results[i] = val;
+					//int idx = getIndex(attrName);
+					//displayResults[idx] = tmp;
+					//results[idx] = val;
 				}
 				
-				motherFrame.addElemToTable(currentTable,displayResults);
+				motherFrame.addElemToTable(currentTable,results);
+				//motherFrame.addElemToTable(currentTable,displayResults);
 				ExplorerController.createEntry(currentTable, results);
 				AddEditDialog.this.dispose();
 			}
