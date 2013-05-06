@@ -273,16 +273,18 @@ public class ExplorerModel {
 	 * array. If no entries are found, it will return an empty array. If there
 	 * was an error processing the request, it will return null.
 	 */
-	public static Object[][] retrieveOwnedAchievements (long steamId, Object[] options) {
+	public static Object[][] retrieveOwnedAchievements (Object[] options) {
 		String commandString = "select ownedAchievement.appId, application.appName, ownedAchievement.steamId, player.personaName, ownedAchievement.achievementName";
 		commandString += " from ownedAchievement";
 		commandString += " join application on ownedAchievement.appId = application.appId";
 		commandString += " join player on ownedAchievement.steamId = player.steamId";
-		commandString += " where player.steamId = " + steamId;
-		if (options.length > 0) {
+		//commandString += " where player.steamId = " + steamId;
+		if(options.length > 0) {
+			commandString += " where ";
 			for (int i = 0; i < options.length; i++) {
+				commandString += options[i].toString();
 				if ( (i+1) < options.length ) {
-				commandString += " and " + options[i].toString();
+					commandString += " and ";
 				}
 			}
 		}
@@ -311,16 +313,18 @@ public class ExplorerModel {
 	 * array. If no entries are found, it will return an empty array. If there
 	 * was an error processing the request, it will return null.
 	 */
-	public static Object[][] retrieveOwnedApplications (long steamId, Object[] options) {
+	public static Object[][] retrieveOwnedApplications (Object[] options) {
 		String commandString = "select ownedApplication.appId, application.appName, ownedApplication.steamId, player.personaName";
 		commandString += " from ownedApplication";
 		commandString += " join application on ownedApplication.appId = application.appId";
 		commandString += " join player on ownedApplication.steamId = player.steamId";
-		commandString += " where player.steamId = " + steamId;
-		if (options.length > 0) {
+		commandString += " where ";
+		if(options.length > 0) {
+			commandString += " where ";
 			for (int i = 0; i < options.length; i++) {
+				commandString += options[i].toString();
 				if ( (i+1) < options.length ) {
-				commandString += " and " + options[i].toString();
+					commandString += " and ";
 				}
 			}
 		}
@@ -513,8 +517,8 @@ public class ExplorerModel {
 		options[0] = (Object) selection;
 		
 		//Object[][] rv = ExplorerModel.retrievePlayers(options);
-		Object[][] rv = ExplorerModel.retrieveOwnedApplications(76561197988083973L, new Object[0][0]);
-		
+		//Object[][] rv = ExplorerModel.retrieveOwnedApplications(76561197988083973L, new Object[0][0]);
+		/*
 		Object[] aRow = rv[0];
 		for (int i = 0; i < aRow.length; i++) {
 			if (aRow[i] != null) {
@@ -523,7 +527,7 @@ public class ExplorerModel {
 			else {
 				System.out.println("Null");
 			}
-		}
+		}*/
 		
 		ExplorerModel.tearDown();
 	}

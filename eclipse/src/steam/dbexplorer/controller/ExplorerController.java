@@ -86,9 +86,11 @@ public class ExplorerController {
 		} else if(tableName.equals("Friends")) {
 			data = ExplorerModel.retrieveFriends(options);
 		} else if(tableName.equals("Owned Achievements")) {
-			data = ExplorerModel.retrieveOwnedAchievements(76561198049281288L, options);
+			//data = ExplorerModel.retrieveOwnedAchievements(76561198049281288L, options);
+			data = ExplorerModel.retrieveOwnedAchievements(options);
 		} else if(tableName.equals("Owned Applications")) {
-			data = ExplorerModel.retrieveOwnedApplications(76561198049281288L, options);
+			//data = ExplorerModel.retrieveOwnedApplications(76561198049281288L, options);
+			data = ExplorerModel.retrieveOwnedApplications(options);
 		} else if(tableName.equals("Players")) {
 			data = ExplorerModel.retrievePlayers(options);
 		}
