@@ -57,18 +57,23 @@ class AddEditDialog extends JDialog {
 			public void actionPerformed(ActionEvent ae) {
 				String[] keys = new String[inputs.size()];
 				String[] results = new String[inputs.size()];
+				String[] displayResults = new String[inputs.size()];
 				keys = inputs.keySet().toArray(keys);
 				for(int i=0;i<keys.length;i++) {
 					String attrName = keys[i];
 					String val = inputs.get(attrName).getText();
+					String tmp = val;
 					if(val.length() == 0) {
 						val = null;
 					} else if("string".equals(ExplorerController.getAttrType(attrName)) && val != null ) {
-						val = "'" + val + "'";
+						tmp = "'" + val + "'";
 					}
-					results[i] = val;
+					int idx = getIndex(attrName);
+					displayResults[idx] = tmp;
+					results[idx] = val;
 				}
-				motherFrame.addElemToTable(currentTable,results);
+				
+				motherFrame.addElemToTable(currentTable,displayResults);
 				ExplorerController.createEntry(currentTable, results);
 				AddEditDialog.this.dispose();
 			}
@@ -87,6 +92,16 @@ class AddEditDialog extends JDialog {
     	this.add(main);
     	this.setMinimumSize(new Dimension(300,200));
     	this.setVisible(true);
+    }
+    
+    private int getIndex(String attrName) {
+    	String[] attr = DBReference.displayNames.get(tableDbString);
+    	for(int i=0;i<attr.length;i++) {
+    		if(attr[i].equals(attrName)) {
+    			return i;
+    		}
+    	}
+    	return -1;
     }
 
 }
