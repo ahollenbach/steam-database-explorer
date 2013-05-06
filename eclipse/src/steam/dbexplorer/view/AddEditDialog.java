@@ -9,60 +9,76 @@ import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
+import steam.dbexplorer.controller.ExplorerController;
 import steam.dbexplorer.dbobject.DBReference;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.util.HashMap;
+import java.util.Set;
  
 class AddEditDialog extends JDialog {
     private JTextField textField;
+    private String currentTable;
  
     private String createStr = "Create";
     private String cancelStr = "Cancel";
-    private JOptionPane optionPane;
-    
+    private HashMap<String, JTextField> inputs = new HashMap<String, JTextField>();
     
     public AddEditDialog(JFrame parent, String tableName) {
     	super(parent, true);
-    	this.setLayout(new BoxLayout(this,BoxLayout.Y_AXIS));
+    	JPanel main = new JPanel();
+    	currentTable = tableName;
+    	main.setLayout(new BoxLayout(main, BoxLayout.Y_AXIS));
+    	main.setMinimumSize(new Dimension(400,400));
     	String[] attr = DBReference.displayNames.get(tableName);
     	for(int i=0;i<attr.length;i++) {
     		JPanel p = new JPanel();
     		JLabel label = new JLabel(attr[i]);
-    		JTextField input = new JTextField();
+    		JTextField input = new JTextField(15);
     		p.add(label);
     		p.add(input);
     		p.setMaximumSize(new Dimension(400,60));
-    		this.add(p);
+    		main.add(p);
+    		inputs.put(attr[i], input);
     	}
-    	Object[] options = {createStr, cancelStr};
-		 
-        //Create the JOptionPane.
-        optionPane = new JOptionPane("Create a new " + tableName.toLowerCase(),
-                                    JOptionPane.QUESTION_MESSAGE,
-                                    JOptionPane.YES_NO_OPTION,
-                                    null,
-                                    options,
-                                    options[0]);
-       
-        setContentPane(optionPane);
-    	/*
+        
+    	
     	JPanel options = new JPanel();
     	JButton create = new JButton(createStr);
     	create.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent ae) {
+				String[] keys = new String[inputs.size()];
+				String[] results = new String[inputs.size()];
+				keys = inputs.keySet().toArray(keys);
+				for(int i=0;i<keys.length;i++) {
+					String attrName = keys[i];
+					String val = inputs.get(attrName).getText();
+					if(val.length() > 0) {
+						val = null;
+					} else if("string".equals(ExplorerController.getAttrType(attrName)) && val != null ) {
+						val = "'" + val + "'";
+					}
+					results[i] = val;
+				}
+				
+				ExplorerController.createEntry(currentTable, results);
+				AddEditDialog.this.dispose();
 			}
 		});
-    	JButton cancel = new JButton(createStr);
+    	JButton cancel = new JButton(cancelStr);
     	cancel.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent ae) {
-				ae.getSource()
+				AddEditDialog.this.dispose();
 			}
 		});
     	options.add(create);
-    	options.add(cancel);*/
+    	options.add(cancel);
+    	main.add(options);
+    	this.add(main);
+    	this.setVisible(true);
     }
 
 }
