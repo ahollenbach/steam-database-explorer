@@ -13,6 +13,10 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Dictionary;
+import java.util.Hashtable;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -20,15 +24,19 @@ import javax.swing.table.DefaultTableModel;
 import steam.dbexplorer.controller.ExplorerController;
 
 public class QueryTab extends JPanel {
-	JComboBox currentTableName;
-	JComboBox curType;
-	JComboBox curAttribute;
-	JComboBox curOperation;
-	JTextField curVal;
-	JPanel selectionPanel;
+	private JComboBox currentTableName;
+	private JComboBox curType;
+	private JComboBox curAttribute;
+	private JComboBox curOperation;
+	private JTextField curVal;
+	private JPanel selectionPanel;
 	private ExplorerController controller;
 	private ResultsTab resultsTab;
 	private JTabbedPane parent;
+	private JList constraintsList;
+	
+	//HashTable<queryPart,humanReadablePart>
+	private Hashtable<String,String> currentConstraints = new Hashtable<String,String>();
 	
 	public QueryTab(JTabbedPane parentPane, ExplorerController controller) {
 		super();
@@ -50,7 +58,7 @@ public class QueryTab extends JPanel {
 		runQuery.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent ae) {
             	String table = (String) currentTableName.getSelectedItem();
-            	resultsTab.updateTable(table);
+            	resultsTab.updateTable(table,currentConstraints.keys());
             	parent.setSelectedIndex(1);
             }
         });	
@@ -65,9 +73,9 @@ public class QueryTab extends JPanel {
 	private JPanel createSelectionPanel() {
 		JPanel p = new JPanel();
 		p.setLayout(new BoxLayout(p, BoxLayout.Y_AXIS));
-		JPanel type = createLabelComboBoxPair("Type: ",ExplorerController.supportedClauses,curType);
-		JPanel attr = createLabelComboBoxPair("Attribute: ",controller.getAttr((String) currentTableName.getSelectedItem()),curAttribute);
-		JPanel ops  = createLabelComboBoxPair("Operator: ",ExplorerController.operators, curOperation);
+		JPanel type = createLabelComboBoxPair("Type: ",curType = new JComboBox(ExplorerController.supportedClauses));
+		JPanel attr = createLabelComboBoxPair("Attribute: ",curAttribute = new JComboBox(controller.getLabels((String) currentTableName.getSelectedItem())));
+		JPanel ops  = createLabelComboBoxPair("Operator: ", curOperation = new JComboBox(ExplorerController.operators));
 		
 		JPanel value  = new JPanel();
 		value.add(new JLabel("Value: "));
@@ -76,19 +84,39 @@ public class QueryTab extends JPanel {
 		value.add(curVal);
 		value.setMaximumSize(new Dimension(800,60));
 		
+		JButton commitButton = new JButton("Add");
+		commitButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent ae) {
+            	// - q prefix means it is used for the query
+            	// - no prefix means it is used for human readable format or is
+            	//   used for both
+            	
+            	String type = (String) curType.getSelectedItem();
+            	String attr = (String) curAttribute.getSelectedItem();
+            	String op   = (String) curOperation.getSelectedItem();
+            	String qOp   = controller.opEquivs[curOperation.getSelectedIndex()];
+            	String val  = curVal.getText();
+            	// #breakinMVC #yolo #TODO refactor
+            	String qString = type + " " + controller.convertToDbAttr(attr) + qOp + val;
+            	String displayString = type + " " + attr + " is " + op + " " + val;
+            	currentConstraints.put(qString, displayString);
+            	updateConstraints();
+            }
+        });	
+		
 		p.add(type);
 		p.add(attr);
 		p.add(ops);
 		p.add(value);
+		p.add(commitButton);
 		p.add(new JPanel()); //spacer
 		p.setVisible(false);
 		return p;
 	}
 
-	private JPanel createLabelComboBoxPair(String title, String[] supportedclauses,JComboBox cb) {
+	private JPanel createLabelComboBoxPair(String title, JComboBox cb) {
 		JPanel p = new JPanel();
 		JLabel label = new JLabel(title);
-		cb = new JComboBox(supportedclauses);
 		
 		p.add(label);
 		p.add(cb);
@@ -99,9 +127,8 @@ public class QueryTab extends JPanel {
 	
 	@SuppressWarnings("unused")
 	private JPanel createLabelComboBoxPair(String title, String[] supportedclauses) {
-		return createLabelComboBoxPair(title, supportedclauses, new JComboBox());
+		return createLabelComboBoxPair(title, new JComboBox(supportedclauses));
 	}
-
 
 	private JPanel createPickTable() {
 		JPanel pickTable = new JPanel();
@@ -122,15 +149,18 @@ public class QueryTab extends JPanel {
 		JLabel title = new JLabel("Set constraints");
 		title.setMaximumSize(new Dimension(100,50));
 		
-		JList constraintsList = new JList(getCurrentConstraints());
+		constraintsList = new JList(getCurrentConstraints());
 		constraintsList.setMinimumSize(new Dimension(800,200));
 		constraintsList.setMaximumSize(new Dimension(800,200));
 		constraintsList.setPreferredSize(new Dimension(800,200));
 		
 		JPanel cudConstraints = createCUDPanel("constraint");
+		JScrollPane scrollPane = new JScrollPane(constraintsList,
+				JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+	            JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 		
 		cPanel.add(title);
-		cPanel.add(constraintsList);
+		cPanel.add(scrollPane);
 		cPanel.add(cudConstraints);
 		
 		cPanel.setMinimumSize(new Dimension(800,260));
@@ -142,8 +172,14 @@ public class QueryTab extends JPanel {
 	}
 
 	private String[] getCurrentConstraints() {
-		String[] constraints = {"where steamID = 5","sort on personaName ascending"};
+		String[] constraints = new String[currentConstraints.size()];
+		Collection<String> tmpConstraints = currentConstraints.values();
+		constraints = tmpConstraints.toArray(constraints);
 		return constraints;
+	}
+	
+	private void updateConstraints() {
+		constraintsList.setListData(getCurrentConstraints());
 	}
 	
 	private JPanel createCUDPanel(String addDeleteWhat) {
