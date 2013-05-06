@@ -13,6 +13,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.HashMap;
+import java.util.Iterator;
 
 import com.github.koraktor.steamcondenser.steam.community.WebApi;
 
@@ -207,7 +208,10 @@ public class ExplorerModel {
 			commandString += " where ";
 			
 			for (int i = 0; i < options.length; i++) {
-				commandString += options[i].toString();
+				//option[0] is type (where, sortBy)
+				//option[1] is value (attr<=5)
+				String[] option = options[i].toString().split(" ");
+				commandString += option[1];
 				if ( (i+1) < options.length ) {
 					commandString += " and ";
 				}
@@ -338,23 +342,33 @@ public class ExplorerModel {
 	 * 
 	 * @param entityName The type of object (Player, Friend, etc.)
 	 * @param primaryKeys The primary keys used to uniquely identify an object.
+	 * @param usingTables 
 	 * @return A system code describing the success or failure of the operation.
 	 */
-	public static SystemCode deleteEntity (String entityName, Object[] primaryKeys) {
-		String deleteString = "delete from ? where";
+	public static SystemCode deleteEntity (String entityName, Object[] primaryKeys, String usingTables) {
+		String deleteString = "delete from ? ";
+		if(usingTables.length() > 0) {
+			deleteString += "using ? ";
+		}
+		deleteString +=  "where";
 		for(int i = 0; i < primaryKeys.length; i++) {
 			if ( i != 0 ) {
 				deleteString += " and";
 			}
 			deleteString += " ?";
 		}
-		deleteString += ";";
-		
+		deleteString += ";";		
+		System.out.println(deleteString);
 		try {
 			PreparedStatement deleteStatement = con.prepareStatement(deleteString);
 			deleteStatement.setString(1, entityName);
+			int offset = 2;
+			if(usingTables.length() > 0) {
+				deleteStatement.setString(2, usingTables);
+				offset = 3;
+			}
 			for(int i = 0; i < primaryKeys.length; i++) {
-				deleteStatement.setObject(i+2, primaryKeys[i]);
+				deleteStatement.setObject(i+offset, primaryKeys[i]);
 			}
 			deleteStatement.execute();
 			return SystemCode.SUCCESS;

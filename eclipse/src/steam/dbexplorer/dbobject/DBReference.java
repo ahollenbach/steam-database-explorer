@@ -15,4 +15,12 @@ public class DBReference {
 	public static final String[] AchievementDisp = {"Application ID", "Achievement Name"};
 	public static final String[] OwnedAchievementDisp = {"Application ID", "Achievement Name", "Steam ID"};
 	public static final String[] OwnedApplicationDisp = {"Application ID", "Steam ID"};
+	
+	//for a "using" clause
+	public static final String PlayerTables = "";
+	public static final String FriendTables = "Player";
+	public static final String ApplicationTables = "";
+	public static final String AchievementTables = "Application";
+	public static final String OwnedAchievementTables = "Application,Player";
+	public static final String OwnedApplicationTables = "Application,Player";
 }

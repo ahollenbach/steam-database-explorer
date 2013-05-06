@@ -134,17 +134,17 @@ public class ExplorerController {
 		//entityName = entityName.replace(" ", ""); //remove space
 		if(entityName == null) {
 		} else if(entityName.equals("Achievements")) {
-			return deleteEntity(entityName,DBReference.AchievementDisp,json);
+			return deleteEntity(entityName,DBReference.AchievementDisp,json,DBReference.AchievementTables);
 		} else if(entityName.equals("Applications")) {
-			return deleteEntity(entityName,DBReference.ApplicationDisp,json);
+			return deleteEntity(entityName,DBReference.ApplicationDisp,json,DBReference.ApplicationTables);
 		} else if(entityName.equals("Friends")) {
-			return deleteEntity(entityName,DBReference.FriendDisp,json);
+			return deleteEntity(entityName,DBReference.FriendDisp,json,DBReference.FriendTables);
 		} else if(entityName.equals("Owned Achievements")) {
-			return deleteEntity(entityName,DBReference.OwnedAchievementDisp,json);
+			return deleteEntity(entityName,DBReference.OwnedAchievementDisp,json,DBReference.OwnedAchievementTables);
 		} else if(entityName.equals("Owned Applications")) {
-			return deleteEntity(entityName,DBReference.OwnedApplicationDisp,json);
+			return deleteEntity(entityName,DBReference.OwnedApplicationDisp,json,DBReference.OwnedApplicationTables);
 		} else if(entityName.equals("Players")) {
-			return deleteEntity(entityName,DBReference.PlayerDisp,json);
+			return deleteEntity(entityName,DBReference.PlayerDisp,json,DBReference.PlayerTables);
 		}
 		return SystemCode.FAILURE;
 	}
@@ -156,14 +156,14 @@ public class ExplorerController {
 	 * @param json A JSONObject containing all the achievement values
 	 * @return Whether the operation was successful or not
 	 */
-	public SystemCode deleteEntity(String entityName, String[] attr, JSONObject json) {
+	public SystemCode deleteEntity(String entityName, String[] attr, JSONObject json, String usingTables) {
 		try {
 			int numAttr = attr.length;
 			String[] values = new String[attr.length];
 			for(int i=0;i<numAttr;i++) {
-				values[i] = json.getString(attr[i]);
+				values[i] = convertToDbAttr(attr[i]) + json.getString(attr[i]);
 			}
-			return ExplorerModel.deleteEntity(entityName, values);
+			return ExplorerModel.deleteEntity(entityName, values,usingTables);
 		} catch(JSONException ex) {
 			return SystemCode.FAILURE;
 		}
