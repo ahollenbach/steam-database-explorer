@@ -148,7 +148,7 @@ public class ExplorerController {
 		}
 		return SystemCode.FAILURE;
 	}
-	
+
 	/**
 	 * Sends a command to the explorer model to delete the entity. Ensures
 	 * the values are in the proper order.
@@ -161,7 +161,7 @@ public class ExplorerController {
 			int numAttr = attr.length;
 			String[] values = new String[attr.length];
 			for(int i=0;i<numAttr;i++) {
-				values[i] = convertToDbAttr(attr[i]) + json.getString(attr[i]);
+				values[i] = convertToDbAttr(attr[i]) + "=" + json.getString(attr[i]);
 			}
 			return ExplorerModel.deleteEntity(entityName, values,usingTables);
 		} catch(JSONException ex) {

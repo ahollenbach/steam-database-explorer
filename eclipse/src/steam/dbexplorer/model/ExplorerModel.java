@@ -357,8 +357,7 @@ public class ExplorerModel {
 			}
 			deleteString += " ?";
 		}
-		deleteString += ";";		
-		System.out.println(deleteString);
+		deleteString += ";";
 		try {
 			PreparedStatement deleteStatement = con.prepareStatement(deleteString);
 			deleteStatement.setString(1, entityName);
@@ -370,6 +369,7 @@ public class ExplorerModel {
 			for(int i = 0; i < primaryKeys.length; i++) {
 				deleteStatement.setObject(i+offset, primaryKeys[i]);
 			}
+			System.out.println(deleteStatement);
 			deleteStatement.execute();
 			return SystemCode.SUCCESS;
 		}
