@@ -323,20 +323,30 @@ public class ExplorerModel {
 	 * @return A system code describing the success or failure of the operation.
 	 */
 	public static SystemCode updateEntity(String entityName, Object[] values, String[] keys) {
-		String updateString = "update ? set ";
+		String updateString = "update " + entityName + " set ";
 		for(int i = 0; i < values.length; i++) {
 			if ( i != 0 ) {
-				updateString += " ,";
+				updateString += " , ";
 			}
-			updateString += " ?";
+			updateString += " " +values[i];
 		}
-		updateString += "where ?;";
+		if (keys.length > 0) {
+			updateString += " where ";
+			for(int i = 0; i < keys.length; i++) {
+				if ( i != 0 ) {
+					updateString += " and ";
+				}
+				updateString += keys[i];
+			}
+		}
+		updateString += ";";
+		System.out.println(updateString);
 		try {
 			PreparedStatement updateStatement = con.prepareStatement(updateString);
-			updateStatement.setString(1, entityName);
-			for(int i = 0; i < values.length; i++) {
-				updateStatement.setObject(i+2, values[i]);
-			}
+			//updateStatement.setString(1, entityName);
+			//for(int i = 0; i < values.length; i++) {
+			//	updateStatement.setObject(i+2, values[i]);
+			//}
 			updateStatement.execute();
 			return SystemCode.SUCCESS;
 		}
