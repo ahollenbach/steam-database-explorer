@@ -43,6 +43,7 @@ public class DBReference {
 		usingTables.put("Friend", "Player");
 		usingTables.put("Application", "");
 		usingTables.put("Achievement", "Application");
+		//usingTables.put("OwnedAchievement", "Application,Achievement,Player");
 		usingTables.put("OwnedAchievement", "Application,Player");
 		usingTables.put("OwnedApplication", "Application,Player");
 	}
