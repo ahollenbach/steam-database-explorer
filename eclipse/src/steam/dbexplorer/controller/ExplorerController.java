@@ -42,7 +42,7 @@ public class ExplorerController {
 
 	public static final String[] opEquivs = {"<",
 											 "<=",
-											 "==",
+											 "=",
 											 "<>",
 											 ">=",
 											 ">"};
