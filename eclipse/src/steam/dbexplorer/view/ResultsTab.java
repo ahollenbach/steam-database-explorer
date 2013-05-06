@@ -136,6 +136,7 @@ public class ResultsTab extends JPanel {
 	                			 results.getValueAt(curRow, col));
 	            	}
 	            	controller.deleteEntity(currentTable, json);
+	            	((DefaultTableModel)results.getModel()).removeRow(curRow);
             	} catch(JSONException ex) {
             	}
             }
