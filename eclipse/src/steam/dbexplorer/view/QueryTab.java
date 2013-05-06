@@ -11,6 +11,7 @@ package steam.dbexplorer.view;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
@@ -66,6 +67,7 @@ public class QueryTab extends JPanel {
 		this.add(pickTable);
 		this.add(constraintsPanel);
 		this.add(selectionPanel);
+		this.add(new JPanel()); //spacer
 		this.add(runQuery);
 	}
 
@@ -75,6 +77,12 @@ public class QueryTab extends JPanel {
 		p.setLayout(new BoxLayout(p, BoxLayout.Y_AXIS));
 		JPanel type = createLabelComboBoxPair("Type: ",curType = new JComboBox(ExplorerController.supportedClauses));
 		JPanel attr = createLabelComboBoxPair("Attribute: ",curAttribute = new JComboBox(controller.getLabels((String) currentTableName.getSelectedItem())));
+		
+		curAttribute.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent ae) {
+            	String table = (String) currentTableName.getSelectedItem();
+            }
+        });
 		JPanel ops  = createLabelComboBoxPair("Operator: ", curOperation = new JComboBox(ExplorerController.operators));
 		
 		JPanel value  = new JPanel();
@@ -84,6 +92,7 @@ public class QueryTab extends JPanel {
 		value.add(curVal);
 		value.setMaximumSize(new Dimension(800,60));
 		
+		JPanel actions = new JPanel();
 		JButton commitButton = new JButton("Add");
 		commitButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent ae) {
@@ -96,20 +105,37 @@ public class QueryTab extends JPanel {
             	String op   = (String) curOperation.getSelectedItem();
             	String qOp   = controller.opEquivs[curOperation.getSelectedIndex()];
             	String val  = curVal.getText();
+            	
+            	if(val.length() == 0) {
+            		JOptionPane.showMessageDialog(null,
+            			    "Please fill out all values.",
+            			    "Value Missing!",
+            			    JOptionPane.ERROR_MESSAGE);
+            		return;
+            	}
             	// #breakinMVC #yolo #TODO refactor
             	String qString = type + " " + controller.convertToDbAttr(attr) + qOp + val;
             	String displayString = type + " " + attr + " is " + op + " " + val;
             	currentConstraints.put(qString, displayString);
             	updateConstraints();
+            	selectionPanel.setVisible(false);
             }
         });	
+		actions.add(commitButton);
+		
+		JButton cancel = new JButton("Cancel");
+		cancel.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent ae) {
+            	selectionPanel.setVisible(false);
+            }
+        });
+		actions.add(cancel);
 		
 		p.add(type);
 		p.add(attr);
 		p.add(ops);
 		p.add(value);
-		p.add(commitButton);
-		p.add(new JPanel()); //spacer
+		p.add(actions);
 		p.setVisible(false);
 		return p;
 	}
@@ -134,6 +160,13 @@ public class QueryTab extends JPanel {
 		JPanel pickTable = new JPanel();
 		JLabel pickTableTitle = new JLabel("Choose a table");
 		currentTableName = new JComboBox(ExplorerController.tableNames);
+		currentTableName.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent ae) {
+            	String table = (String) ((JComboBox)ae.getSource()).getSelectedItem();
+            	//hacky way to do this
+            	curAttribute.setModel(new JComboBox(controller.getLabels(table)).getModel());
+            }
+        });
 		//add listener on tablename change
 		pickTable.add(pickTableTitle); 
 		pickTable.add(currentTableName);

@@ -49,6 +49,8 @@ public class ExplorerController {
 	
 	public static final String[] stringOps = {"contains","equals"};
 	
+	public static final String[] dateOps = {"before","on","after"};
+	
 	/** 
 	 * A string value of the last entity type to be fetched. Might be 
 	 * deprecated.
