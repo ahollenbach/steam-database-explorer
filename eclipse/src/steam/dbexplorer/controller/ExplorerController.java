@@ -255,7 +255,7 @@ public class ExplorerController {
 		values.put("Profile URL", "string");
 		values.put("Real Name", "string");
 		values.put("Application ID", "long");
-		values.put("Date Joined", "time");
+		values.put("Date Joined", "string"); //treat it like a string
 		values.put("Steam ID #1", "long");
 		values.put("Steam ID #2", "long");
 		values.put("Application Name", "string");
