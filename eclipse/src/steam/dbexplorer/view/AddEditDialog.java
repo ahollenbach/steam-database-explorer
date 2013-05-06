@@ -88,9 +88,9 @@ class AddEditDialog extends JDialog {
     	options.add(create);
     	options.add(cancel);
     	main.add(options);
-    	main.setMinimumSize(new Dimension(300,200));
+    	main.setMinimumSize(new Dimension(300,250));
     	this.add(main);
-    	this.setMinimumSize(new Dimension(300,200));
+    	this.setMinimumSize(new Dimension(300,250));
     	this.setVisible(true);
     }
     
