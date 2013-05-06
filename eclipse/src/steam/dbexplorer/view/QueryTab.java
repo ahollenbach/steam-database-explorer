@@ -114,7 +114,8 @@ public class QueryTab extends JPanel {
             		return;
             	}
             	// #breakinMVC #yolo #TODO refactor
-            	String qString = type + " " + controller.convertToDbAttr(attr) + qOp + val;
+            	//String qString = type + " " + controller.convertToDbAttr(attr) + qOp + val;
+            	String qString = " " + controller.convertToDbAttr(attr) + qOp + val;
             	String displayString = type + " " + attr + " is " + op + " " + val;
             	currentConstraints.put(qString, displayString);
             	updateConstraints();
@@ -165,6 +166,11 @@ public class QueryTab extends JPanel {
             	String table = (String) ((JComboBox)ae.getSource()).getSelectedItem();
             	//hacky way to do this
             	curAttribute.setModel(new JComboBox(controller.getLabels(table)).getModel());
+            	currentConstraints.clear();
+            	updateConstraints();
+        		constraintsList.validate();
+        		//constraintsList.invalidate();
+        		//constraintsList.repaint();
             }
         });
 		//add listener on tablename change

@@ -115,6 +115,7 @@ public class ExplorerModel {
 			}
 		}
 		commandString += ";";
+		System.out.println(commandString);
 		try {
 			PreparedStatement commandStatement = con.prepareStatement(commandString, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
 			commandStatement.execute();
@@ -140,6 +141,7 @@ public class ExplorerModel {
 		if (options.length > 0) {
 			commandString += " where ";
 			
+			
 			for (int i = 0; i < options.length; i++) {
 				commandString += options[i].toString();
 				if ( (i+1) < options.length ) {
@@ -148,6 +150,7 @@ public class ExplorerModel {
 			}
 		}
 		commandString += ";";
+		System.out.println(commandString);
 		try {
 			PreparedStatement commandStatement = con.prepareStatement(commandString, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
 			commandStatement.execute();
@@ -181,6 +184,8 @@ public class ExplorerModel {
 			}
 		}
 		commandString += ";";
+		System.out.println(commandString);
+
 		try {
 			PreparedStatement commandStatement = con.prepareStatement(commandString, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
 			commandStatement.execute();
@@ -210,14 +215,17 @@ public class ExplorerModel {
 			for (int i = 0; i < options.length; i++) {
 				//option[0] is type (where, sortBy)
 				//option[1] is value (attr<=5)
-				String[] option = options[i].toString().split(" ");
-				commandString += option[1];
+				//String[] option = options[i].toString().split(" ");
+				//commandString += option[1];
+				commandString += options[i].toString();
 				if ( (i+1) < options.length ) {
 					commandString += " and ";
 				}
 			}
 		}
 		commandString += ";";
+		System.out.println(commandString);
+
 		try {
 			PreparedStatement commandStatement = con.prepareStatement(commandString, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
 			commandStatement.execute();
@@ -253,6 +261,8 @@ public class ExplorerModel {
 			}
 		}
 		commandString += ";" ;
+		System.out.println(commandString);
+
 		try {
 			PreparedStatement commandStatement = con.prepareStatement(commandString, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
 			commandStatement.execute();
@@ -289,6 +299,8 @@ public class ExplorerModel {
 			}
 		}
 		commandString += ";" ;
+		System.out.println(commandString);
+
 		try {
 			PreparedStatement commandStatement = con.prepareStatement(commandString, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
 			commandStatement.execute();
