@@ -357,7 +357,9 @@ public class ExplorerModel {
 	public static SystemCode deleteEntity (String entityName, Object[] primaryKeys, String usingTables) {
 		String deleteString = "delete from " + entityName;
 		if(usingTables.length() > 0) {
-			deleteString += "using ? ";
+			deleteString += " using ";
+			deleteString += usingTables;
+			deleteString += " ";
 		}
 		deleteString +=  " where ";
 		for(int i = 0; i < primaryKeys.length; i++) {
