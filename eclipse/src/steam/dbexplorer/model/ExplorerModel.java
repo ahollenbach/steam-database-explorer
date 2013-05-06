@@ -66,7 +66,32 @@ public class ExplorerModel {
 	 */
 	public static SystemCode createEntity(String entityName, Object[] values) {
 		//TODO Double-check this code for functionality
-		String createString = "insert into ? values (";
+		String createString = "insert into " + entityName + " values (";
+		for(int i = 0; i < values.length; i++) {
+			
+			if ( i != 0 ) {
+				createString += " ,";
+			}
+			createString += values[i];
+		}
+		createString += ");";
+		
+		System.out.println(createString);
+		try {
+			PreparedStatement createStatement = con.prepareStatement(createString, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
+			//createStatement.setString(1, entityName);
+			//for(int i = 0; i < values.length; i++) {
+			//	createStatement.setObject(i+2, values[i]);
+			//}
+			System.out.println(createStatement);
+			createStatement.execute();
+			return SystemCode.SUCCESS;
+		}
+		catch (SQLException e) {
+			e.printStackTrace();
+			return SystemCode.FAILURE;
+		}
+/*		String createString = "insert into " + entityName + " values (";
 		for(int i = 0; i < values.length; i++) {
 			
 			if ( i != 0 ) {
@@ -90,7 +115,7 @@ public class ExplorerModel {
 		catch (SQLException e) {
 			e.printStackTrace();
 			return SystemCode.FAILURE;
-		}
+		} */
 	}
 	
 	/**
