@@ -225,4 +225,21 @@ public class ExplorerController {
 		
 		return values.get(orig);
 	}
+	
+	public static String getAttrType(String orig) {
+		//SO YUCKY GET RID OF THIS TOO
+		HashMap<String, String> values = new HashMap<String, String>();
+		values.put("Steam ID", "long");
+		values.put("Persona Name", "string");
+		values.put("Profile URL", "string");
+		values.put("Real Name", "string");
+		values.put("Application ID", "long");
+		values.put("Date Joined", "time");
+		values.put("Steam ID #1", "long");
+		values.put("Steam ID #2", "long");
+		values.put("Application Name", "string");
+		values.put("Achievement Name", "string");
+		
+		return values.get(orig);
+	}
 }

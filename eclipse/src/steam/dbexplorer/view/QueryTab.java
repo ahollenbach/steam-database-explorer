@@ -99,6 +99,7 @@ public class QueryTab extends JPanel {
             	// - q prefix means it is used for the query
             	// - no prefix means it is used for human readable format or is
             	//   used for both
+            	String table = (String) currentTableName.getSelectedItem();
             	
             	String type = (String) curType.getSelectedItem();
             	String attr = (String) curAttribute.getSelectedItem();
@@ -112,6 +113,9 @@ public class QueryTab extends JPanel {
             			    "Value Missing!",
             			    JOptionPane.ERROR_MESSAGE);
             		return;
+            	} 
+            	if("string".equals(controller.getAttrType(attr))){
+            		val = "\'" + val + "\'";
             	}
             	// #breakinMVC #yolo #TODO refactor
             	//String qString = type + " " + controller.convertToDbAttr(attr) + qOp + val;
