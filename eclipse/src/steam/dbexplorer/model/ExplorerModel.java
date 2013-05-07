@@ -171,7 +171,7 @@ public class ExplorerModel {
 				}
 			}
 		}
-		commandString += ";";
+		commandString += "order by steamID;";
 		System.out.println(commandString);
 		try {
 			PreparedStatement commandStatement = con.prepareStatement(commandString, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
@@ -206,7 +206,7 @@ public class ExplorerModel {
 				}
 			}
 		}
-		commandString += ";";
+		commandString += "order by steamID1;";
 		System.out.println(commandString);
 		try {
 			PreparedStatement commandStatement = con.prepareStatement(commandString, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
@@ -240,7 +240,7 @@ public class ExplorerModel {
 				}
 			}
 		}
-		commandString += ";";
+		commandString += "order by appID;";
 		System.out.println(commandString);
 
 		try {
@@ -280,7 +280,7 @@ public class ExplorerModel {
 				}
 			}
 		}
-		commandString += ";";
+		commandString += "order by appID;";
 		System.out.println(commandString);
 
 		try {
@@ -319,7 +319,7 @@ public class ExplorerModel {
 				}
 			}
 		}
-		commandString += ";" ;
+		commandString += "order by appID;" ;
 		System.out.println(commandString);
 
 		try {
@@ -359,7 +359,7 @@ public class ExplorerModel {
 				}
 			}
 		}
-		commandString += ";" ;
+		commandString += "order by appID;" ;
 		System.out.println(commandString);
 
 		try {
