@@ -40,7 +40,7 @@ public class ExplorerView {
 	
 	public void start() {
 		frame = new JFrame(Main.programName);
-		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setSize(new Dimension(defaultWidth,defaultHeight));
 		
 		buildTabs();

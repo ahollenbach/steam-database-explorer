@@ -19,15 +19,16 @@ public enum SystemCode {
 	
 	/*Error Codes*/
 	/** A generic failure code. Try to use a more explicit code if possible. */
-	FAILURE			("The operation was completed successfully."	,false),
+	FAILURE			("The operation was completed unsuccessfully."	,false),
 	
 	/*Database codes*/
 	//TODO Drill down and return more explicit database errors.
-	DB_SUCCESS	("The database operation was completed successfully."	 ,true),
-	DB_ERROR	("The database operation was not completed successfully" ,false),
-	;
+	DB_SUCCESS	("The database operation was completed successfully."	 		,true),
+	DB_ERROR	("The database operation was not completed successfully" 		,false),
+	BAD_FK      ("Cannot find a? that matches the details you gave us! "		,false),
+	BAD_VALUE   ("Sorry, ? is of the incorrect type."							,false);
 	
-	private final String message;
+	private String message;
 	/**
 	 * True if success code
 	 * False if error code
@@ -51,6 +52,16 @@ public enum SystemCode {
 	 */
 	public String getMessage() {
 		return message;
+	}
+	
+	/**
+	 * Alters a message with specific data. Fills in the ? in the
+	 * existing message with the message
+	 * 
+	 * @param message a message to add
+	 */
+	public void alterMessage(String message) {
+		this.message = this.message.replace("?", message);
 	}
 	
 	/**

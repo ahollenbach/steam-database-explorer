@@ -61,7 +61,7 @@ public class ResultsTab extends JPanel {
 	}
 	
 	public void updateTable(String tableName, Enumeration<String> constraintsEnum) {
-		ArrayList<String> constraintsAL = Collections.list(constraintsEnum);
+		ArrayList<String> constraintsAL = constraintsEnum != null ? Collections.list(constraintsEnum) : new ArrayList<String>();
 		String[] constraints = new String[constraintsAL.size()];
 		constraints = constraintsAL.toArray(constraints);
 		Object[][] data = controller.getData(tableName,constraints);
@@ -148,7 +148,7 @@ public class ResultsTab extends JPanel {
 	}
 	
 	public void addElemToTable(String tableName, String[] values) {
-		System.out.println("Adding new element");
-		((DefaultTableModel)results.getModel()).addRow(values);
+		updateTable(controller.getCurrentTable(), null);
+		//((DefaultTableModel)results.getModel()).addRow(values);
 	}
 }

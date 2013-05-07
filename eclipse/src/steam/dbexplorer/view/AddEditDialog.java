@@ -9,6 +9,9 @@ import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
+import org.postgresql.util.PSQLException;
+
+import steam.dbexplorer.SystemCode;
 import steam.dbexplorer.controller.ExplorerController;
 import steam.dbexplorer.dbobject.DBReference;
 
@@ -79,9 +82,15 @@ class AddEditDialog extends JDialog {
 				}
 				
 				motherFrame.addElemToTable(currentTable,displayResults);
-				//motherFrame.addElemToTable(currentTable,displayResults);
-				ExplorerController.createEntry(currentTable, results);
-				AddEditDialog.this.dispose();
+				SystemCode result = ExplorerController.createEntry(currentTable, results);
+				if(!result.isSuccess()) {
+					JOptionPane.showMessageDialog(null, 
+												  result.getMessage(),
+												  "Insertion Error",
+												  JOptionPane.ERROR_MESSAGE);
+				} else {
+					AddEditDialog.this.dispose();
+				}
 			}
 		});
     	JButton cancel = new JButton(cancelStr);

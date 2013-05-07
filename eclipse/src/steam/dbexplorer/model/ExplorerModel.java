@@ -14,11 +14,17 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import org.apache.commons.lang3.StringUtils;
+import org.postgresql.util.PSQLException;
 
 import com.github.koraktor.steamcondenser.steam.community.WebApi;
 
 import steam.dbexplorer.Credentials;
 import steam.dbexplorer.SystemCode;
+import steam.dbexplorer.dbobject.DBReference;
 
 public class ExplorerModel {
 	
@@ -65,7 +71,6 @@ public class ExplorerModel {
 	 * @return A system code describing the success or failure of the operation.
 	 */
 	public static SystemCode createEntity(String entityName, Object[] values) {
-		//TODO Double-check this code for functionality
 		String createString = "insert into " + entityName + " values (";
 		for(int i = 0; i < values.length; i++) {
 			
@@ -76,20 +81,19 @@ public class ExplorerModel {
 		}
 		createString += ");";
 		
-		System.out.println(createString);
+		PreparedStatement createStatement = null;
 		try {
-			PreparedStatement createStatement = con.prepareStatement(createString, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
+			createStatement = con.prepareStatement(createString, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
 			//createStatement.setString(1, entityName);
 			//for(int i = 0; i < values.length; i++) {
 			//	createStatement.setObject(i+2, values[i]);
 			//}
-			System.out.println(createStatement);
+			//System.out.println(createStatement);
 			createStatement.execute();
 			return SystemCode.SUCCESS;
 		}
-		catch (SQLException e) {
-			e.printStackTrace();
-			return SystemCode.FAILURE;
+		catch (SQLException ex) {
+			return handleInsertUpdateError(createStatement.toString(), entityName, ex);
 		}
 /*		String createString = "insert into " + entityName + " values (";
 		for(int i = 0; i < values.length; i++) {
@@ -118,6 +122,33 @@ public class ExplorerModel {
 		} */
 	}
 	
+	private static SystemCode handleInsertUpdateError(String queryString, String table, SQLException ex) {
+		String message = ex.getLocalizedMessage();
+		if(message.contains("foreign key constraint")) {
+			//Pattern p = Pattern.compile("\\([^)]*\\)");
+			//Matcher m = p.matcher(message); trying to get incorrect id using regex
+			//System.out.println(m.group());
+			String failTable = message.substring(message.indexOf("in table \"")+10,message.length()-2);
+			if(startsWithVowel(failTable)) {
+				failTable = "n " + failTable; //proper grammar!
+			} else {
+				failTable = " " + failTable;
+			}
+			SystemCode r = SystemCode.BAD_FK;
+			r.alterMessage(failTable);
+			return r;
+		} else if(message.contains("ERROR: syntax error") || message.contains("ERROR: column")) {
+			int pos = Integer.parseInt(message.substring(message.indexOf("Position: ")+10));
+			String createSub = queryString.substring(0,pos);
+			int colNum = StringUtils.countMatches(createSub, ",");
+			String attrName = DBReference.getDisplayName(table,colNum);				
+			SystemCode r = SystemCode.BAD_VALUE;
+			r.alterMessage(attrName);
+			return r;
+		}
+		return SystemCode.FAILURE;
+	}
+
 	/**
 	 * Grabs players from the database and converts values from the resultSet 
 	 * into an array of objects. Parameters subject to change in the future.
@@ -384,8 +415,9 @@ public class ExplorerModel {
 		}
 		updateString += ";";
 		System.out.println(updateString);
+		PreparedStatement updateStatement = null;
 		try {
-			PreparedStatement updateStatement = con.prepareStatement(updateString);
+			updateStatement = con.prepareStatement(updateString);
 			//updateStatement.setString(1, entityName);
 			//for(int i = 0; i < values.length; i++) {
 			//	updateStatement.setObject(i+2, values[i]);
@@ -393,9 +425,8 @@ public class ExplorerModel {
 			updateStatement.execute();
 			return SystemCode.SUCCESS;
 		}
-		catch (SQLException e) {
-			e.printStackTrace();
-			return SystemCode.FAILURE;
+		catch (SQLException ex) {
+			return handleInsertUpdateError(updateStatement.toString(), entityName, ex);
 		}
 	}
 	
@@ -530,6 +561,14 @@ public class ExplorerModel {
 		}*/
 		
 		ExplorerModel.tearDown();
+	}
+	
+	private static boolean startsWithVowel(String s) {
+	 return (s.startsWith ("a") || 
+			 s.startsWith ("e") || 
+			 s.startsWith ("i") || 
+			 s.startsWith ("o") || 
+			 s.startsWith ("u") );
 	}
 
 }

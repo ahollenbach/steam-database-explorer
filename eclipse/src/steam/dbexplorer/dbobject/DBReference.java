@@ -64,4 +64,9 @@ public class DBReference {
 		}
 		return false;
 	}
+	
+	public static String getDisplayName(String table, int colNum) {
+		String upper = table.substring(0, 1).toUpperCase() + table.substring(1);
+		return displayNames.get(upper)[colNum];
+	}
 }
