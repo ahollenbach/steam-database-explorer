@@ -156,7 +156,7 @@ public class Populate {
 						return friendsToAdd; //We already called populatePlayer on this person
 					}
 				} catch (SQLException e) {
-		            e.printStackTrace();
+		            
 				}
 				
 				try {
@@ -207,15 +207,15 @@ public class Populate {
 								                	insertAchievementStatement.execute();
 								                }
 							                } catch (SQLException e) {
-							                	e.printStackTrace();
+							                	
 							                }
 							            }
 									} catch (Exception e) {
-										e.printStackTrace();
+										
 									}
 								}
 							} catch (Exception e) {
-								e.printStackTrace();
+								
 							}
 						}
 						for (SteamId temp:friends) {
@@ -223,14 +223,14 @@ public class Populate {
 								friendsToAdd.addAll((populatePlayers(recursive+1, con, temp.getSteamId64(), appsAdded)));	
 								friendsToAdd.add(new Pair(id.getSteamId64(), temp.getSteamId64()));
 							} catch (Exception e) {
-								e.printStackTrace();
+								
 							}
 						}
 					} catch (Exception e) {
-						e.printStackTrace();
+						
 					}
 				} catch (Exception e) {
-					e.printStackTrace();
+					
 				}
 				if (recursive == 0) {
 					for (Iterator<Pair> it = friendsToAdd.iterator(); it.hasNext();) {
@@ -244,7 +244,7 @@ public class Populate {
 							//friends of "leaf nodes" in the graph of players not having their friends added
 							//thus they don't exist.  However, can't simply ignore them as they may
 							//have friendships to other "leafs:
-							e.printStackTrace();
+							
 						}
 					}
 					return new HashSet<Pair>();
@@ -253,7 +253,7 @@ public class Populate {
 					return friendsToAdd;
 				}
 			} catch (SQLException e) {
-				e.printStackTrace();
+				
 				return new HashSet<Pair>();
 			}
 		}
@@ -284,11 +284,11 @@ public class Populate {
                 	insertStatement.execute();
                 	appsAdded.add(Long.parseLong(app.getString("appid")));
                 } catch (SQLException e) {
-                	e.printStackTrace();
+                	
                 }
             }
         } catch(Exception e) {
-            e.printStackTrace();
+            
         }
 		return appsAdded;
 	}
@@ -319,12 +319,12 @@ public class Populate {
 		                insertAchivement.setString(2, ach.getString("name"));
 	                	insertAchivement.execute();
 	                } catch (Exception e) {
-	                	e.printStackTrace();
+	                	
 	                }
 	            }
 			}
         } catch(Exception e) {
-            e.printStackTrace();
+            
         }
 	}
 	
@@ -438,7 +438,7 @@ public class Populate {
 			createOwnedAchState.execute();
 			
 		} catch (SQLException e) {
-			e.printStackTrace();
+			
 		}
 	}
 	
@@ -483,7 +483,7 @@ public class Populate {
 			//76561198049281288  -  Maddjak
 			con.close();
 		} catch (Exception e) {
-			e.printStackTrace();
+			
 		} 
 	}
 }
