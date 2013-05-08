@@ -48,6 +48,12 @@ public class QueryTab extends JPanel {
 	 */
 	private Hashtable<String,String> currentConstraints = new Hashtable<String,String>();
 	
+	/**
+	 * Creates a new "Build a Query" tab.
+	 * 
+	 * @param parentPane The parent tab pane
+	 * @param controller The controller for the view
+	 */
 	public QueryTab(JTabbedPane parentPane, ExplorerController controller) {
 		super();
 		this.controller = controller;
@@ -58,7 +64,7 @@ public class QueryTab extends JPanel {
 		JPanel tableSelectPanel = createTableSelectPanel();
 		
 		//create the list of active constraints
-		JPanel constraintsPanel = createConstraintsPanel();
+		JPanel constraintsPanel = createConstraintsListPanel();
 		
 		//create the create/edit filter form
 		filterBuilder = createFilterBuilder();
@@ -80,7 +86,11 @@ public class QueryTab extends JPanel {
 		this.add(runQuery);
 	}
 
-	
+	/**
+	 * Creates a panel for adding a new filter.
+	 * 
+	 * @return a panel that contains the add new filter selection elements
+	 */
 	private JPanel createFilterBuilder() {
 		JPanel p = new JPanel();
 		p.setLayout(new BoxLayout(p, BoxLayout.Y_AXIS));
@@ -141,9 +151,9 @@ public class QueryTab extends JPanel {
 	            	currentConstraints.put(queryString, displayString);
             	} else { //sort by
             		String order   = (String) curOrder.getSelectedItem();
-            		String qOrd = order.equals("Ascending") ? "asc" : "desc";
+            		String qOrder = order.equals("Ascending") ? "asc" : "desc";
             		
-	            	String qString = "sort=" + ExplorerController.convertToDbAttr(attr) + " " + qOrd;
+	            	String queryString = "sort=" + ExplorerController.convertToDbAttr(attr) + " " + qOrder;
 	            	String displayString = "Sort by " + attr + " in " + order + " order";
 	            	
 	            	//check if you are already sorting on this attribute.
@@ -151,16 +161,13 @@ public class QueryTab extends JPanel {
 	            	while(keys.hasMoreElements()) {
 	            		String key = keys.nextElement();
 	            		if(key.contains("sort=" + ExplorerController.convertToDbAttr(attr))) {
-	            			JOptionPane.showMessageDialog(null,
-		            			    "You are already sorting on this attribute!",
-		            			    "Unable to add sort!",
-		            			    JOptionPane.ERROR_MESSAGE);
+	            			PopupFactory.errorPopup("You are already sorting on this attribute!",
+		            			    				"Unable to add sort!");
 	            			return;
 	            		}
 	            	}
-	            	currentConstraints.put(qString, displayString);
+	            	currentConstraints.put(queryString, displayString);
             	}
-            	
             	updateConstraints();
             	filterBuilder.setVisible(false);
             	
@@ -188,6 +195,15 @@ public class QueryTab extends JPanel {
 		return p;
 	}
 
+	/**
+	 * An abstracted method that creates a label from the title and pairs
+	 * it in a JPanel with a supplied combobox.
+	 * 
+	 * @param title The label of the pair
+	 * @param cb a combobox 
+	 * @return the JPanel containing the label on the left and the combobox 
+	 * on the right.
+	 */
 	private JPanel createLabelComboBoxPair(String title, JComboBox cb) {
 		JPanel p = new JPanel();
 		JLabel label = new JLabel(title);
@@ -198,15 +214,17 @@ public class QueryTab extends JPanel {
 		p.setMaximumSize(new Dimension(800,60));
 		return p;
 	}
-	
-	@SuppressWarnings("unused")
-	private JPanel createLabelComboBoxPair(String title, String[] supportedclauses) {
-		return createLabelComboBoxPair(title, new JComboBox(supportedclauses));
-	}
 
+	/**
+	 * Creates the table select pane, which prompts
+	 * the user for a table to select and provides a 
+	 * dropdown of the available tables to choose from.
+	 * 
+	 * @return The table select pane
+	 */
 	private JPanel createTableSelectPanel() {
-		JPanel pickTable = new JPanel();
-		JLabel pickTableTitle = new JLabel("Choose a table");
+		JPanel tableSelectPanel = new JPanel();
+		JLabel selectTableTitle = new JLabel("Choose a table");
 		currentTableName = new JComboBox(ExplorerController.tableNames);
 		currentTableName.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent ae) {
@@ -218,15 +236,19 @@ public class QueryTab extends JPanel {
         		constraintsList.validate();
             }
         });
-		//add listener on tablename change
-		pickTable.add(pickTableTitle); 
-		pickTable.add(currentTableName);
-		pickTable.setMaximumSize(new Dimension(800,200));
-		return pickTable;
+		tableSelectPanel.add(selectTableTitle); 
+		tableSelectPanel.add(currentTableName);
+		tableSelectPanel.setMaximumSize(new Dimension(800,200));
+		return tableSelectPanel;
 	}
 
-
-	private JPanel createConstraintsPanel() {
+	/**
+	 * Creates the table of active constraints and the label,
+	 * and wraps it up in a JPanel.
+	 * 
+	 * @return the table of active constraints
+	 */
+	private JPanel createConstraintsListPanel() {
 		JPanel cPanel = new JPanel();
 		cPanel.setLayout(new BoxLayout(cPanel, BoxLayout.Y_AXIS));
 		
@@ -262,6 +284,12 @@ public class QueryTab extends JPanel {
 		return cPanel;
 	}
 
+	/**
+	 * Gets a list of the current constraints in HUMAN-READABLE
+	 * format.
+	 * 
+	 * @return An array of human-readable constraints
+	 */
 	private String[] getCurrentConstraints() {
 		String[] constraints = new String[currentConstraints.size()];
 		Collection<String> tmpConstraints = currentConstraints.values();
@@ -269,6 +297,11 @@ public class QueryTab extends JPanel {
 		return constraints;
 	}
 	
+	/**
+	 * Updates the list of constraints by resetting list data
+	 * to what results from getCurrentConstraints. If no constraints
+	 * remain, the delete and clear buttons are disabled.
+	 */
 	private void updateConstraints() {
 		constraintsList.setListData(getCurrentConstraints());
 		if(currentConstraints.isEmpty()) {
@@ -278,6 +311,14 @@ public class QueryTab extends JPanel {
     	}
 	}
 	
+	/**
+	 * Creates the control buttons - the add,delete,and clear
+	 * buttons.
+	 * 
+	 * @param addDeleteWhat The thing you are deleting. Should just be
+	 * "constraint"
+	 * @return A JPanel containing all the controls needed.
+	 */
 	private JPanel createCUDPanel(String addDeleteWhat) {
 		JPanel p = new JPanel();
 		JButton add = new JButton("Add new " + addDeleteWhat);
@@ -320,7 +361,11 @@ public class QueryTab extends JPanel {
 		return p;
 	}
 
-
+	/**
+	 * Sets a reference to the results tab
+	 * 
+	 * @param resultPanel The results tab to reference.
+	 */
 	public void setResultsPanelRef(ResultsTab resultPanel) {
 		this.resultsTab = resultPanel;
 	}

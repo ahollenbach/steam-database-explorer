@@ -1,25 +1,23 @@
+package steam.dbexplorer.controller;
+
+import java.util.HashMap;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import steam.dbexplorer.SystemCode;
+import steam.dbexplorer.Utils;
+import steam.dbexplorer.dbobject.DBReference;
+import steam.dbexplorer.model.ExplorerModel;
+
 /**
  * The explorer controller is used to interface between the model and the view.
  * The controller is in charge of checking that all input taken from the view
  * makes sense, and converting information from the model into a type preferred
  * by the view.
  * 
- * @author Andrew Hollenbach <ahollenbach>
+ * @author Andrew Hollenbach (anh7216@rit.edu)
  */
-
-package steam.dbexplorer.controller;
-
-import java.io.StringWriter;
-import java.io.ObjectInputStream.GetField;
-import java.util.HashMap;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import steam.dbexplorer.SystemCode;
-import steam.dbexplorer.dbobject.DBReference;
-import steam.dbexplorer.model.ExplorerModel;
 
 public class ExplorerController {	
 	public static final String[] tableNames = {"Achievements", 
@@ -62,6 +60,14 @@ public class ExplorerController {
 	public ExplorerController() {
 	}
 	
+	/**
+	 * Retrieves data from the database for the given tablename with the 
+	 * supplied options.
+	 * 
+	 * @param tableName The name of the table to retrive from
+	 * @param options A list of options regarding where conditionals and sort bys
+	 * @return A 2d array of data of the requested information
+	 */
 	public Object[][] getData(String tableName, String[] options) {
 		this.currentTable = tableName;
 		ExplorerModel.setUp();
@@ -85,6 +91,14 @@ public class ExplorerController {
 		return data;
 	}
 
+	/**
+	 * Gets a list of attributes for the given table in human-readable
+	 * form. 
+	 * 
+	 * @param tableName The name of the table to get the attributes from
+	 * @return a list of attributes for the given table in human-readable
+	 * form. 
+	 */
 	public String[] getLabels(String tableName) {
 		tableName = DBReference.convertToDBFormat(tableName);
 		String[] labels = DBReference.displayNames.get(tableName);
@@ -95,9 +109,10 @@ public class ExplorerController {
 	 * Creates an entry using the given string values. Verifies if the 
 	 * values are correct. If any of the values are not parsable, returns
 	 * false. 
+	 * 
 	 * @param values The values to insert
 	 * @param entityName The name of the entity to create.
-	 * @return
+	 * @return a systemcode regarding the success/failure of the operation
 	 */
 	public static SystemCode createEntry(String entityName, String[] values) {
 		int numAttr = DBReference.tableLabels.get(entityName).length;
@@ -112,20 +127,15 @@ public class ExplorerController {
 		return ExplorerModel.createEntity(entityName,values);
 	}
 	
+	/**
+	 * Deletes an entry with the given key values. The json must contain
+	 * the full primary key.
+	 * 
+	 * @param entityName The table to delete from
+	 * @param json The values of the element to delete
+	 * @return a systemcode regarding the success/failure of the operation
+	 */
 	public SystemCode deleteEntity(String entityName, JSONObject json) {
-		/*
-		try {
-			String[] values = new String[json.length()];
-			String[] names = JSONObject.getNames(json);
-			
-			for(int i=0; i<json.length();i++) {
-				String val = json.getString(names[i]);
-				values[i] = convertToDbAttr(names[i]) + "=" + val;
-			}
-			return ExplorerModel.deleteEntity(entityName, values);
-		} catch (JSONException e) {
-		}
-		return SystemCode.FAILURE;*/
 		entityName = DBReference.convertToDBFormat(entityName);
 		String[] attr = DBReference.primaryKeys.get(entityName);
 		String usingTables = DBReference.usingTables.get(entityName);
@@ -136,7 +146,7 @@ public class ExplorerController {
 			for(int i=0;i<numAttr;i++) {
 				String val = json.getString(attr[i]);
 				if("string".equals(getAttrType(attr[i]))){
-            		val = "\'" + val + "\'";
+            		val = Utils.surroundWithQuotes(val);
             	}
 				values[i] = convertToDbAttr(attr[i]) + "=" + val;
 			}
@@ -171,6 +181,14 @@ public class ExplorerController {
 		}
 	}
 	
+	/**
+	 * Updates an entry with the given values. The json must contain
+	 * the full primary key.
+	 * 
+	 * @param entityName The table to update
+	 * @param json The values of the element
+	 * @return a systemcode regarding the success/failure of the operation
+	 */
 	public SystemCode updateEntity(String entityName, JSONObject json) {
 		entityName = DBReference.convertToDBFormat(entityName);
 		String[] attr = DBReference.editableValues.get(entityName);
@@ -201,6 +219,18 @@ public class ExplorerController {
 		}
 	}
 	
+	/**
+	 * Converts a Human readable attribute to the database format
+	 * and appends the best guess for the belonging table.
+	 * 
+	 * @param orig the original attribute name
+	 * @return The attribute database-isized
+	 * 
+	 * i.e.
+	 * <pre>
+	 * Steam ID ->player.steamId
+	 * </pre>
+	 */
 	public static String convertToDbAttr(String orig) {
 		//SO YUCKY GET RID OF THIS
 		HashMap<String, String> values = new HashMap<String, String>();
@@ -218,6 +248,18 @@ public class ExplorerController {
 		return values.get(orig);
 	}
 	
+	/**
+	 * Converts a Human readable attribute to the database format
+	 * and does NOT append the best guess for the belonging table.
+	 * 
+	 * @param orig the original attribute name
+	 * @return The attribute database-isized
+	 * 
+	 * i.e.
+	 * <pre>
+	 * Steam ID -> steamId
+	 * </pre>
+	 */
 	public static String dbAttrNoPrefix(String orig) {
 		//SO YUCKY GET RID OF THIS
 		HashMap<String, String> values = new HashMap<String, String>();
@@ -235,6 +277,12 @@ public class ExplorerController {
 		return values.get(orig);
 	}
 	
+	/**
+	 * A lovely, hardcoded list of the various attributes
+	 * 
+	 * @param orig the original attribute name
+	 * @return The type of that attribute as a string [string,long]
+	 */
 	public static String getAttrType(String orig) {
 		//SO YUCKY GET RID OF THIS TOO
 		HashMap<String, String> values = new HashMap<String, String>();
@@ -243,7 +291,7 @@ public class ExplorerController {
 		values.put("Profile URL", "string");
 		values.put("Real Name", "string");
 		values.put("Application ID", "long");
-		values.put("Date Joined", "string"); //treat it like a string
+		values.put("Date Joined", "string"); //treat it like a string, stored in db as date
 		values.put("Steam ID #1", "long");
 		values.put("Steam ID #2", "long");
 		values.put("Application Name", "string");
@@ -252,6 +300,10 @@ public class ExplorerController {
 		return values.get(orig);
 	}
 	
+	/**
+	 * Gets the current table
+	 * @return the current table
+	 */
 	public String getCurrentTable() {
 		return currentTable;
 	}

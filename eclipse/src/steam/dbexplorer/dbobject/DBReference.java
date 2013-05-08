@@ -36,6 +36,7 @@ public class DBReference {
 	 * This stores a list of the column labels for each table that are to be
 	 * presented to the end user. May include joined information from other 
 	 * tables.
+	 * Use this hashmap for populate the labels in the JTable!
 	 */
 	public static HashMap<String, String[]> tableLabels    = new HashMap<String, String[]>();
 	
