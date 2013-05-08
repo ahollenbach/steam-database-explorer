@@ -1,8 +1,6 @@
 /**
- * The populate class populated the tables with all of the required data
- * values. It is assumed that the database will be empty, although it may 
- * be ran if the database has some data preloaded.  The populate method
- * is coded to be able to get a variable amount of data.
+ * The populate class creates and populates the tables with all of the required data
+ * values.  The populate method is coded to be able to get a variable amount of data.
  * 
  *  @author Andrew Hollenbach <anh7216@rit.edu>
  *  @author Andrew DeVoe <ard5852@rit.edu>
@@ -27,7 +25,6 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.github.koraktor.steamcondenser.steam.community.SteamGame;

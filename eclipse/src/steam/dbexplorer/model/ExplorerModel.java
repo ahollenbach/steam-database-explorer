@@ -1,3 +1,11 @@
+/**
+ * The explorer model is a model of the database tables in Java. This class 
+ * can be used to interface with the PSQL database for all the CRUD operations.
+ * 
+ *  @author Andrew Hollenbach (anh7216@rit.edu)
+ *  @author Andrew DeVoe (ard5852@rit.edu)
+ */
+
 package steam.dbexplorer.model;
 
 import java.sql.Connection;
@@ -14,13 +22,6 @@ import steam.dbexplorer.Credentials;
 import steam.dbexplorer.SystemCode;
 import steam.dbexplorer.dbobject.DBReference;
 
-/**
- * The explorer model is a model of the database tables in Java. This class 
- * can be used to interface with the PSQL database for all the CRUD operations.
- * 
- *  @author Andrew Hollenbach (anh7216@rit.edu)
- *  @author Andrew DeVoe (ard5852@rit.edu)
- */
 public class ExplorerModel {
 	
 	static Connection con;
@@ -81,6 +82,7 @@ public class ExplorerModel {
 		catch (SQLException ex) {
 			return handleInsertUpdateError(createStatement.toString(), entityName, ex);
 		}
+		
 /*		String createString = "insert into " + entityName + " values (";
 		for(int i = 0; i < values.length; i++) {
 			
@@ -90,8 +92,7 @@ public class ExplorerModel {
 			createString += " ?";
 		}
 		createString += ");";
-		
-		
+				
 		try {
 			PreparedStatement createStatement = con.prepareStatement(createString, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
 			createStatement.setString(1, entityName);
@@ -159,7 +160,6 @@ public class ExplorerModel {
 	public static Object[][] retrievePlayers(Object[] options) {
 		String commandString = "select * from player ";
 		commandString += getWhereAndSort(options,"steamId");
-		System.out.println(commandString);
 		try {
 			PreparedStatement commandStatement = con.prepareStatement(commandString, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
 			commandStatement.execute();
@@ -184,7 +184,6 @@ public class ExplorerModel {
 		String commandString = "select friend.steamId1, one.personaName, friend.steamId2, two.personaName";
 		commandString += " from friend join Player as one on one.steamId = friend.steamId1 join Player as two on two.steamId = friend.steamId2 ";
 		commandString += getWhereAndSort(options,"steamId1");
-		System.out.println(commandString);
 		try {
 			PreparedStatement commandStatement = con.prepareStatement(commandString, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
 			commandStatement.execute();
@@ -209,8 +208,6 @@ public class ExplorerModel {
 		String commandString = "select * from application ";
 		commandString += getWhereAndSort(options,"appId");
 		commandString += ";";
-		System.out.println(commandString);
-
 		try {
 			PreparedStatement commandStatement = con.prepareStatement(commandString, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
 			commandStatement.execute();
@@ -236,7 +233,6 @@ public class ExplorerModel {
 		commandString += " join application on achievement.appId = application.appId ";
 		commandString += getWhereAndSort(options,"appId");
 		commandString += ";";
-		System.out.println(commandString);
 		try {
 			PreparedStatement commandStatement = con.prepareStatement(commandString, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
 			commandStatement.execute();
@@ -265,7 +261,6 @@ public class ExplorerModel {
 		commandString += " join player on ownedAchievement.steamId = player.steamId ";
 		commandString += getWhereAndSort(options,"appId");
 		commandString += ";" ;
-		System.out.println(commandString);
 		try {
 			PreparedStatement commandStatement = con.prepareStatement(commandString, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
 			commandStatement.execute();
@@ -295,7 +290,6 @@ public class ExplorerModel {
 		commandString += " join player on ownedApplication.steamId = player.steamId ";
 		commandString += getWhereAndSort(options,"appId");
 		commandString += ";" ;
-		System.out.println(commandString);
 		try {
 			PreparedStatement commandStatement = con.prepareStatement(commandString, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
 			commandStatement.execute();
@@ -362,16 +356,7 @@ public class ExplorerModel {
 				
 				
 			}
-			//TODO OH GOD FIX THIS
-//			System.out.println(values[i].toString().substring(0, 11));
-//			if (values[i].toString().substring(0, 11).equals("timeCreated")) {
-//				String temp = values[i].toString();
-//				temp = temp.replaceFirst("=", "='");
-//				temp = temp.concat("'");
-//				updateString += " " + temp;
-//			} else {
-				updateString += " " + values[i];
-//			}
+			updateString += " " + values[i];
 		}
 		if (keys.length > 0) {
 			updateString += " where ";
@@ -385,7 +370,6 @@ public class ExplorerModel {
 			}
 		}
 		updateString += ";";
-		System.out.println(updateString);
 		PreparedStatement updateStatement = null;
 		try {
 			updateStatement = con.prepareStatement(updateString);
@@ -422,7 +406,6 @@ public class ExplorerModel {
 			deleteString += primaryKeys[i];
 		}
 		deleteString += ";";
-		System.out.println(deleteString);
 		try {
 			PreparedStatement deleteStatement = con.prepareStatement(deleteString);
 			deleteStatement.execute();
@@ -483,7 +466,6 @@ public class ExplorerModel {
 		int rsRows = rs.getRow();
 		int rsCols = rs.getMetaData().getColumnCount();
 		stringsToReturn = new String[rsRows][rsCols];
-		
 		rs.beforeFirst();
 		for (int currentRow = 0; currentRow < rsRows; currentRow++) {
 			rs.next();

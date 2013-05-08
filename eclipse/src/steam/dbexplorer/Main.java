@@ -17,12 +17,18 @@ public class Main {
 	/**
 	 * Executes the Steam Database Explorer or Populate method
 	 * 
-	 * @param args  No args are expected
+	 * @param args  Whether to run populate or not.  Populate will
+	 *     be ran only if the args has exactly one parameter which is
+	 *     populate.  Otherwise the GUI is made.
 	 */
 	public static void main(String[] args) {
-		ExplorerController controller = new ExplorerController();
-		ExplorerView view = new ExplorerView(controller);
-		view.start();
-		//Populate.populate();
+		if (args.length == 1 && args[0].toLowerCase().equals("populate")) {
+			Populate.populate();
+		} 
+		else {
+			ExplorerController controller = new ExplorerController();
+			ExplorerView view = new ExplorerView(controller);
+			view.start();
+		}
 	}
 }
