@@ -93,6 +93,7 @@ public class ResultsTab extends JPanel {
 				rowsChanged.add(event.getFirstRow());
 			}
 		});
+		System.out.println(tableModel.getRowCount());
 		results.setModel(tableModel);
 	}
 
