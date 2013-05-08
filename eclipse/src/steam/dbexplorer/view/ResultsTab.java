@@ -197,6 +197,7 @@ public class ResultsTab extends JPanel {
 	            		controller.updateEntity(currentTable, json);
 	            	}
 	            	update.setEnabled(false);
+	            	rowsChanged.clear();
             	} catch(JSONException e) {
 	            }
             }
