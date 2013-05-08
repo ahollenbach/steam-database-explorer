@@ -34,6 +34,8 @@ public enum SystemCode {
 	 * A message describing the system code.
 	 */
 	private String message;
+	
+	private String customMessage;
 	/**
 	 * True if success code
 	 * False if error code
@@ -48,6 +50,7 @@ public enum SystemCode {
 	SystemCode(String message, Boolean type) {
 		this.message = message;
 		this.type = type;
+		this.customMessage = "";
 	}
 	
 	/**
@@ -56,7 +59,7 @@ public enum SystemCode {
 	 * @return A message
 	 */
 	public String getMessage() {
-		return message;
+		return this.message.replace("?", customMessage);
 	}
 	
 	/**
@@ -66,7 +69,8 @@ public enum SystemCode {
 	 * @param message a message to add
 	 */
 	public void alterMessage(String message) {
-		this.message = this.message.replace("?", message);
+		this.customMessage = message;
+		
 	}
 	
 	/**
