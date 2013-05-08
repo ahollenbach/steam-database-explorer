@@ -36,7 +36,7 @@ public class ExplorerModel {
 			Class.forName("org.postgresql.Driver");
 			con = DriverManager.getConnection(url, Credentials.DATABASEUSERNAME ,Credentials.DATABASEPASSWORD);
 		} catch (Exception e) {
-			e.printStackTrace();
+			
 		}
     }
     
@@ -47,7 +47,7 @@ public class ExplorerModel {
     	try {
 		    con.close();
     	} catch (Exception e) {
-        	e.printStackTrace();
+        	
         }
     }
     
@@ -103,7 +103,7 @@ public class ExplorerModel {
 			return SystemCode.SUCCESS;
 		}
 		catch (SQLException e) {
-			e.printStackTrace();
+			
 			return SystemCode.FAILURE;
 		} */
 	}
@@ -144,10 +144,10 @@ public class ExplorerModel {
 			int firstQuote = message.indexOf("\"")+1;
 			String missingPK = message.substring(firstQuote,message.indexOf("\"", firstQuote));
 			r.alterMessage(missingPK);
-			ex.printStackTrace();
+			
 			return SystemCode.MISSING_PK;
 		}
-		ex.printStackTrace();
+		
 		return SystemCode.FAILURE;
 	}
 
@@ -169,7 +169,7 @@ public class ExplorerModel {
 			commandStatement.execute();
 			return getObjectArray(commandStatement.getResultSet());
 		} catch (SQLException e) {
-			e.printStackTrace();
+			
 			return null;
 		}
 	}
@@ -193,7 +193,7 @@ public class ExplorerModel {
 			commandStatement.execute();
 			return getObjectArray(commandStatement.getResultSet());
 		} catch (SQLException e) {
-			e.printStackTrace();
+			
 			return null;
 		}
 	}
@@ -216,7 +216,7 @@ public class ExplorerModel {
 			commandStatement.execute();
 			return getObjectArray(commandStatement.getResultSet());
 		} catch (SQLException e) {
-			e.printStackTrace();
+			
 			return null;
 		}
 	}
@@ -240,7 +240,7 @@ public class ExplorerModel {
 			commandStatement.execute();
 			return getObjectArray(commandStatement.getResultSet());
 		} catch (SQLException e) {
-			e.printStackTrace();
+			
 			return null;
 		}
 	}
@@ -267,7 +267,7 @@ public class ExplorerModel {
 			commandStatement.execute();
 			return getObjectArray(commandStatement.getResultSet());
 		} catch (SQLException e) {
-			e.printStackTrace();
+			
 			return null;
 		}
 	}
@@ -295,7 +295,7 @@ public class ExplorerModel {
 			commandStatement.execute();
 			return getObjectArray(commandStatement.getResultSet());
 		} catch (SQLException e) {
-			e.printStackTrace();
+			
 			return null;
 		}
 	}
@@ -447,7 +447,7 @@ public class ExplorerModel {
 			return SystemCode.SUCCESS;
 		}
 		catch (SQLException e) {
-			e.printStackTrace();
+			
 			return SystemCode.FAILURE;
 		} */
 	}
