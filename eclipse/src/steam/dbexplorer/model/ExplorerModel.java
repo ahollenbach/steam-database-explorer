@@ -414,7 +414,6 @@ public class ExplorerModel {
 			return SystemCode.SUCCESS;
 		}
 		catch (SQLException e) {
-			e.printStackTrace();
 			return SystemCode.FAILURE;
 		}
 /*		

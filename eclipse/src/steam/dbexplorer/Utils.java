@@ -42,7 +42,7 @@ public class Utils {
 		s = "";
 		for(int i=0;i<valArr.length;i++) {
 			if(i==valArr.length-1) s += valArr[i];
-			else s += valArr[i] + "\\\'";
+			else s += valArr[i] + "''";
 		}
 		return s;
 	}
