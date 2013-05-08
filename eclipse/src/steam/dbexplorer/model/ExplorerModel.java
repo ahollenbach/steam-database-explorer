@@ -158,16 +158,7 @@ public class ExplorerModel {
 	 */
 	public static Object[][] retrievePlayers(Object[] options) {
 		String commandString = "select * from player ";
-		if (options.length > 0) {
-			commandString += " where ";	
-			for (int i = 0; i < options.length; i++) {
-				commandString += options[i].toString();
-				if ( (i+1) < options.length ) {
-					commandString += " and ";
-				}
-			}
-		}
-		commandString += " order by steamID;";
+		commandString += getWhereAndSort(options,"steamId");
 		System.out.println(commandString);
 		try {
 			PreparedStatement commandStatement = con.prepareStatement(commandString, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
@@ -192,16 +183,7 @@ public class ExplorerModel {
 	public static Object[][] retrieveFriends(Object[] options) {
 		String commandString = "select friend.steamId1, one.personaName, friend.steamId2, two.personaName";
 		commandString += " from friend join Player as one on one.steamId = friend.steamId1 join Player as two on two.steamId = friend.steamId2 ";
-		if (options.length > 0) {
-			commandString += " where ";
-			for (int i = 0; i < options.length; i++) {
-				commandString += options[i].toString();
-				if ( (i+1) < options.length ) {
-					commandString += " and ";
-				}
-			}
-		}
-		commandString += " order by steamID1;";
+		commandString += getWhereAndSort(options,"steamId1");
 		System.out.println(commandString);
 		try {
 			PreparedStatement commandStatement = con.prepareStatement(commandString, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
@@ -225,17 +207,8 @@ public class ExplorerModel {
 	 */
 	public static Object[][] retrieveApplications(Object[] options) {
 		String commandString = "select * from application ";
-		if (options.length > 0) {
-			commandString += " where ";
-			
-			for (int i = 0; i < options.length; i++) {
-				commandString += options[i].toString();
-				if ( (i+1) < options.length ) {
-					commandString += " and ";
-				}
-			}
-		}
-		commandString += " order by appID;";
+		commandString += getWhereAndSort(options,"appId");
+		commandString += ";";
 		System.out.println(commandString);
 
 		try {
@@ -261,17 +234,8 @@ public class ExplorerModel {
 	public static Object[][] retrieveAchievements(Object[] options) {
 		String commandString = "select achievement.appId, application.appName, achievement.achievementName from achievement";
 		commandString += " join application on achievement.appId = application.appId ";
-		if (options.length > 0) {
-			commandString += " where ";
-			
-			for (int i = 0; i < options.length; i++) {
-				commandString += options[i].toString();
-				if ( (i+1) < options.length ) {
-					commandString += " and ";
-				}
-			}
-		}
-		commandString += " order by appID;";
+		commandString += getWhereAndSort(options,"appId");
+		commandString += ";";
 		System.out.println(commandString);
 		try {
 			PreparedStatement commandStatement = con.prepareStatement(commandString, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
@@ -299,16 +263,8 @@ public class ExplorerModel {
 		commandString += " from ownedAchievement";
 		commandString += " join application on ownedAchievement.appId = application.appId";
 		commandString += " join player on ownedAchievement.steamId = player.steamId ";
-		if(options.length > 0) {
-			commandString += " where ";
-			for (int i = 0; i < options.length; i++) {
-				commandString += options[i].toString();
-				if ( (i+1) < options.length ) {
-					commandString += " and ";
-				}
-			}
-		}
-		commandString += " order by appID;" ;
+		commandString += getWhereAndSort(options,"appId");
+		commandString += ";" ;
 		System.out.println(commandString);
 		try {
 			PreparedStatement commandStatement = con.prepareStatement(commandString, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
@@ -337,16 +293,8 @@ public class ExplorerModel {
 		commandString += " from ownedApplication";
 		commandString += " join application on ownedApplication.appId = application.appId";
 		commandString += " join player on ownedApplication.steamId = player.steamId ";
-		if(options.length > 0) {
-			commandString += " where ";
-			for (int i = 0; i < options.length; i++) {
-				commandString += options[i].toString();
-				if ( (i+1) < options.length ) {
-					commandString += " and ";
-				}
-			}
-		}
-		commandString += " order by appID;" ;
+		commandString += getWhereAndSort(options,"appId");
+		commandString += ";" ;
 		System.out.println(commandString);
 		try {
 			PreparedStatement commandStatement = con.prepareStatement(commandString, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
@@ -356,6 +304,33 @@ public class ExplorerModel {
 			e.printStackTrace();
 			return null;
 		}
+	}
+	
+	private static String getWhereAndSort(Object[] options, String defaultSort) {
+		String commandString = "";
+		if (options.length > 0) {
+			String where = " where ";
+			String orderBy = " order by ";
+			for (int i = 0; i < options.length; i++) {
+				String command = options[i].toString();
+				if(command.split("=").length == 2 && command.split("=")[0].equals("sort")) {
+					orderBy += command.split("=")[1] + ", "; 
+				} else {
+					where += command + " and ";
+				}
+			}
+			if(!where.equals(" where ")) {
+				where = where.substring(0,orderBy.length()-4);
+				commandString += where;
+			}
+			if(orderBy.equals(" order by ")) commandString += " order by " + 
+														defaultSort + ";";
+			else  {
+				orderBy = orderBy.substring(0,orderBy.length()-2);
+				commandString += orderBy;
+			}
+		}
+		return commandString;
 	}
 	
 	/**

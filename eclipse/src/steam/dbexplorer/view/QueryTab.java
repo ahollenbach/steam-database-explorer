@@ -18,9 +18,12 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Dictionary;
+import java.util.Enumeration;
 import java.util.Hashtable;
 
 import javax.swing.*;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 
 import steam.dbexplorer.controller.ExplorerController;
@@ -29,13 +32,20 @@ public class QueryTab extends JPanel {
 	private JComboBox currentTableName;
 	private JComboBox curType;
 	private JComboBox curAttribute;
+	private JComboBox curOrder;
+	private JPanel order;
 	private JComboBox curOperation;
+	private JPanel ops;
 	private JTextField curVal;
+	private JPanel value;
 	private JPanel selectionPanel;
 	private ExplorerController controller;
 	private ResultsTab resultsTab;
 	private JTabbedPane parent;
 	private JList constraintsList;
+	private JButton delete;
+	private JButton clear;
+	//private JButton edit;
 	
 	//HashTable<queryPart,humanReadablePart>
 	private Hashtable<String,String> currentConstraints = new Hashtable<String,String>();
@@ -76,55 +86,103 @@ public class QueryTab extends JPanel {
 	private JPanel createSelectionPanel() {
 		JPanel p = new JPanel();
 		p.setLayout(new BoxLayout(p, BoxLayout.Y_AXIS));
-		JPanel type = createLabelComboBoxPair("Type: ",curType = new JComboBox(ExplorerController.supportedClauses));
-		JPanel attr = createLabelComboBoxPair("Attribute: ",curAttribute = new JComboBox(controller.getLabels((String) currentTableName.getSelectedItem())));
 		
+		JPanel attr = createLabelComboBoxPair("Attribute: ",curAttribute = new JComboBox(controller.getLabels((String) currentTableName.getSelectedItem())));
 		curAttribute.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent ae) {
             	String table = (String) currentTableName.getSelectedItem();
             }
         });
-		JPanel ops  = createLabelComboBoxPair("Operator: ", curOperation = new JComboBox(ExplorerController.operators));
+		order  = createLabelComboBoxPair("Order: ", curOrder = new JComboBox(ExplorerController.supportedOrders));
+		order.setVisible(false);
+		ops  = createLabelComboBoxPair("Operator: ", curOperation = new JComboBox(ExplorerController.operators));
 		
-		JPanel value  = new JPanel();
+		value  = new JPanel();
 		value.add(new JLabel("Value: "));
-		//String curAttr = (String) curAttribute.getSelectedItem();
 		curVal = new JTextField(15);
 		value.add(curVal);
 		value.setMaximumSize(new Dimension(800,60));
 		
+		JPanel type = createLabelComboBoxPair("Type: ",curType = new JComboBox(ExplorerController.supportedClauses));
+		curType.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent ae) {
+            	if(((String) curType.getSelectedItem()).equals("Sort by")) {
+            		ops.setVisible(false);
+            		value.setVisible(false);
+            		
+            		order.setVisible(true);
+            	} else {
+            		ops.setVisible(true);
+            		value.setVisible(true);
+            		
+            		order.setVisible(false);
+            	}
+            }
+        });
+
+		
 		JPanel actions = new JPanel();
-		JButton commitButton = new JButton("Add");
+		JButton commitButton = new JButton("Go");
 		commitButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent ae) {
             	// - q prefix means it is used for the query
             	// - no prefix means it is used for human readable format or is
             	//   used for both
             	String table = (String) currentTableName.getSelectedItem();
-            	
             	String type = (String) curType.getSelectedItem();
             	String attr = (String) curAttribute.getSelectedItem();
-            	String op   = (String) curOperation.getSelectedItem();
-            	String qOp   = controller.opEquivs[curOperation.getSelectedIndex()];
-            	String val  = curVal.getText();
-            	
-            	if(val.length() == 0) {
-            		JOptionPane.showMessageDialog(null,
-            			    "Please fill out all values.",
-            			    "Value Missing!",
-            			    JOptionPane.ERROR_MESSAGE);
-            		return;
-            	} 
-            	if("string".equals(controller.getAttrType(attr))){
-            		val = "\'" + val + "\'";
+            	if(((String) curType.getSelectedItem()).equals("Where")) {
+	            	String op   = (String) curOperation.getSelectedItem();
+	            	String qOp   = controller.opEquivs[curOperation.getSelectedIndex()];
+	            	String val  = curVal.getText();
+	            	
+	            	if(val.length() == 0) {
+	            		JOptionPane.showMessageDialog(null,
+	            			    "Please fill out all values.",
+	            			    "Value Missing!",
+	            			    JOptionPane.ERROR_MESSAGE);
+	            		return;
+	            	} 
+	            	if("string".equals(controller.getAttrType(attr))){
+	            		val = "\'" + val + "\'";
+	            	}
+	            	// #breakinMVC #yolo #TODO refactor
+	            	//String qString = type + " " + controller.convertToDbAttr(attr) + qOp + val;
+	            	String qString = " " + controller.convertToDbAttr(attr) + qOp + val;
+	            	String displayString = type + " " + attr + " is " + op + " " + val;
+	            	currentConstraints.put(qString, displayString);
+            	} else { //sort by
+            		String order   = (String) curOrder.getSelectedItem();
+            		String qOrd = null;
+            		if(order.equals("Ascending")) {
+            			qOrd = "asc";
+            		} else {
+            			qOrd = "desc";
+            		}
+            		
+	            	String qString = "sort=" + controller.convertToDbAttr(attr) + " " + qOrd;
+	            	String displayString = "Sort by " + attr + " in " + order + " order";
+	            	
+	            	//check if you are already sorting on this attribute.
+	            	Enumeration<String> keys = currentConstraints.keys();
+	            	while(keys.hasMoreElements()) {
+	            		String key = keys.nextElement();
+	            		if(key.contains("sort=" + controller.convertToDbAttr(attr))) {
+	            			JOptionPane.showMessageDialog(null,
+		            			    "You are already sorting on this attribute!",
+		            			    "Unable to add sort!",
+		            			    JOptionPane.ERROR_MESSAGE);
+	            			return;
+	            		}
+	            	}
+	            	currentConstraints.put(qString, displayString);
             	}
-            	// #breakinMVC #yolo #TODO refactor
-            	//String qString = type + " " + controller.convertToDbAttr(attr) + qOp + val;
-            	String qString = " " + controller.convertToDbAttr(attr) + qOp + val;
-            	String displayString = type + " " + attr + " is " + op + " " + val;
-            	currentConstraints.put(qString, displayString);
+            	
             	updateConstraints();
             	selectionPanel.setVisible(false);
+            	
+        		//edit.setEnabled(false);
+        		delete.setEnabled(false);
             }
         });	
 		actions.add(commitButton);
@@ -139,6 +197,7 @@ public class QueryTab extends JPanel {
 		
 		p.add(type);
 		p.add(attr);
+		p.add(order);
 		p.add(ops);
 		p.add(value);
 		p.add(actions);
@@ -192,6 +251,13 @@ public class QueryTab extends JPanel {
 		title.setMaximumSize(new Dimension(100,50));
 		
 		constraintsList = new JList(getCurrentConstraints());
+		constraintsList.addListSelectionListener(new ListSelectionListener() {
+			@Override
+			public void valueChanged(ListSelectionEvent e) {
+				delete.setEnabled(true);
+				//edit.setEnabled(true);
+			}
+		});
 		constraintsList.setMinimumSize(new Dimension(800,200));
 		constraintsList.setMaximumSize(new Dimension(800,200));
 		constraintsList.setPreferredSize(new Dimension(800,200));
@@ -222,6 +288,11 @@ public class QueryTab extends JPanel {
 	
 	private void updateConstraints() {
 		constraintsList.setListData(getCurrentConstraints());
+		if(currentConstraints.isEmpty()) {
+    		//edit.setEnabled(false);
+    		delete.setEnabled(false);
+    		clear.setEnabled(false);
+    	}
 	}
 	
 	private JPanel createCUDPanel(String addDeleteWhat) {
@@ -230,13 +301,14 @@ public class QueryTab extends JPanel {
 		add.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent ae) {
             	selectionPanel.setVisible(true);
+            	clear.setEnabled(true);
             }
-        });		
+        });
 		p.add(add);
-		JButton edit = new JButton("Edit " + addDeleteWhat);
-		edit.setEnabled(false);
-		p.add(edit);
-		JButton delete = new JButton("Remove " + addDeleteWhat);
+		//edit = new JButton("Edit " + addDeleteWhat);
+		//edit.setEnabled(false);
+		//p.add(edit);
+		delete = new JButton("Remove " + addDeleteWhat);
 		delete.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent ae) {
             	String selectedValue = (String) constraintsList.getSelectedValue();
@@ -247,9 +319,11 @@ public class QueryTab extends JPanel {
         		constraintsList.validate();
             }
         });
+		delete.setEnabled(false);
 		
 		p.add(delete);
-		JButton clear = new JButton("Clear " + addDeleteWhat + "s");
+		clear = new JButton("Clear " + addDeleteWhat + "s");
+		clear.setEnabled(false);
 		clear.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent ae) {
             	//hacky way to do this

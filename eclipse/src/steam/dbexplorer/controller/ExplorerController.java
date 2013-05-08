@@ -29,8 +29,11 @@ public class ExplorerController {
 										  	   "Owned Applications", 
 										  	   "Players" };
 	
-	public static final String[] supportedClauses = {"where",
-													 "sort by"};
+	public static final String[] supportedClauses = {"Where",
+													 "Sort by"};
+	
+	public static final String[] supportedOrders = {"Ascending",
+	 												"Descending"};
 	
 	public static final String[] operators = {"less than",
 											  "less than or equal to",
@@ -84,7 +87,7 @@ public class ExplorerController {
 
 	public String[] getLabels(String tableName) {
 		tableName = DBReference.convertToDBFormat(tableName);
-		String[] labels = DBReference.tableLabels.get(tableName);
+		String[] labels = DBReference.displayNames.get(tableName);
 		return labels;
 	}
 	
