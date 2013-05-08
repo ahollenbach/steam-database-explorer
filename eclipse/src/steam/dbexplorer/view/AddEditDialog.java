@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Set;
  
+@SuppressWarnings("serial")
 class AddEditDialog extends JDialog {
     private JTextField textField;
     private String currentTable;
@@ -89,7 +90,6 @@ class AddEditDialog extends JDialog {
 												  JOptionPane.ERROR_MESSAGE);
 				} else {
 					motherFrame.addElemToTable();
-					AddEditDialog.this.dispose();
 				}
 			}
 		});

@@ -1,12 +1,8 @@
 package steam.dbexplorer.view;
 
 import java.awt.Dimension;
-import java.awt.GridLayout;
 import java.awt.event.KeyEvent;
-
 import javax.swing.*;
-import javax.swing.filechooser.FileSystemView;
-
 import steam.dbexplorer.Main;
 import steam.dbexplorer.controller.ExplorerController;
 
