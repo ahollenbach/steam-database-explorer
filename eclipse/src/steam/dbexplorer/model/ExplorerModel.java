@@ -190,7 +190,8 @@ public class ExplorerModel {
 	 * was an error processing the request, it will return null.
 	 */
 	public static Object[][] retrieveFriends(Object[] options) {
-		String commandString = "select * from friend ";
+		String commandString = "select friend.steamId1, one.personaName, friend.steamId2, two.personaName";
+		commandString += " from friend join Player as one on one.steamId = friend.steamId1 join Player as two on two.steamId = friend.steamId2 ";
 		if (options.length > 0) {
 			commandString += " where ";
 			for (int i = 0; i < options.length; i++) {
