@@ -1,8 +1,9 @@
 /**
  * The explorer model is a model of the database tables in Java. This class 
- * can be used to interface with the psql database for all the CRUD operations.
+ * can be used to interface with the PSQL database for all the CRUD operations.
  * 
- * @author Andrew Hollenbach <ahollenbach>
+ *  @author Andrew Hollenbach <anh7216@rit.edu>
+ *  @author Andrew DeVoe <ard5852@rit.edu>
  */
 package steam.dbexplorer.model;
 
@@ -11,11 +12,7 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 import org.postgresql.util.PSQLException;
@@ -30,6 +27,9 @@ public class ExplorerModel {
 	
 	static Connection con;
 	
+	/**
+	 * Sets up the ExplorerModel to be ready to execute JDBC operations
+	 */
     public static void setUp() {
 		try {
 			WebApi.setApiKey(Credentials.APIKEY);
@@ -42,6 +42,9 @@ public class ExplorerModel {
 		}
     }
     
+    /**
+     * Sets up the ExplorerModel to close the connection to the database
+     */
     public static void tearDown() {
     	try {
 		    con.close();
@@ -51,17 +54,7 @@ public class ExplorerModel {
     }
     
     
-	/**
-	 * A map of the primary keys in the table. This is used in the generic
-	 * update/delete entity methods.
-	 */
-	private static final HashMap<String, String[]> tableKeys;
-	static
-    {
-		tableKeys = new HashMap<String, String[]>();
-		//TODO Add all the tables and their primary keys here
-    }
-	
+
 	/**
 	 * Creates a new entry in the database in the supplied table with the 
 	 * supplied values.
@@ -84,11 +77,6 @@ public class ExplorerModel {
 		PreparedStatement createStatement = null;
 		try {
 			createStatement = con.prepareStatement(createString, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
-			//createStatement.setString(1, entityName);
-			//for(int i = 0; i < values.length; i++) {
-			//	createStatement.setObject(i+2, values[i]);
-			//}
-			//System.out.println(createStatement);
 			createStatement.execute();
 			return SystemCode.SUCCESS;
 		}
@@ -122,6 +110,15 @@ public class ExplorerModel {
 		} */
 	}
 	
+	/**
+	 * Handles errors while attempting to insert data into the database.  Takes the SQLException
+	 * and returns a user friendly error message
+	 * 
+	 * @param queryString The string query that generated the error
+	 * @param table  The table that the query was being executed on
+	 * @param ex  The SQLException throw
+	 * @return  The user friendly error message.
+	 */
 	private static SystemCode handleInsertUpdateError(String queryString, String table, SQLException ex) {
 		String message = ex.getLocalizedMessage();
 		if(message.contains("foreign key constraint")) {
@@ -160,8 +157,7 @@ public class ExplorerModel {
 	 * was an error processing the request, it will return null.
 	 */
 	public static Object[][] retrievePlayers(Object[] options) {
-		String commandString = "select * from player";
-		
+		String commandString = "select * from player ";
 		if (options.length > 0) {
 			commandString += " where ";	
 			for (int i = 0; i < options.length; i++) {
@@ -184,21 +180,19 @@ public class ExplorerModel {
 	}
 	
 	/**
-	 * Grabs players from the database and converts values from the resultSet 
+	 * Grabs friends from the database and converts values from the resultSet 
 	 * into an array of objects. Parameters subject to change in the future.
 	 *  
 	 * @param options A list of parameters used to filter/sort the results
-	 * @return An array of an array of values pertaining to player entries
+	 * @return An array of an array of values pertaining to friend entries
 	 * in the database that match the search terms provided in the options
 	 * array. If no entries are found, it will return an empty array. If there
 	 * was an error processing the request, it will return null.
 	 */
 	public static Object[][] retrieveFriends(Object[] options) {
-		String commandString = "select * from friend";
+		String commandString = "select * from friend ";
 		if (options.length > 0) {
 			commandString += " where ";
-			
-			
 			for (int i = 0; i < options.length; i++) {
 				commandString += options[i].toString();
 				if ( (i+1) < options.length ) {
@@ -219,17 +213,17 @@ public class ExplorerModel {
 	}
 	
 	/**
-	 * Grabs players from the database and converts values from the resultSet 
+	 * Grabs applications from the database and converts values from the resultSet 
 	 * into an array of objects. Parameters subject to change in the future.
 	 *  
 	 * @param options A list of parameters used to filter/sort the results
-	 * @return An array of an array of values pertaining to player entries
+	 * @return An array of an array of values pertaining to application entries
 	 * in the database that match the search terms provided in the options
 	 * array. If no entries are found, it will return an empty array. If there
 	 * was an error processing the request, it will return null.
 	 */
 	public static Object[][] retrieveApplications(Object[] options) {
-		String commandString = "select * from application";
+		String commandString = "select * from application ";
 		if (options.length > 0) {
 			commandString += " where ";
 			
@@ -254,11 +248,11 @@ public class ExplorerModel {
 	}
 	
 	/**
-	 * Grabs players from the database and converts values from the resultSet 
+	 * Grabs achievements from the database and converts values from the resultSet 
 	 * into an array of objects. Parameters subject to change in the future.
 	 *  
 	 * @param options A list of parameters used to filter/sort the results
-	 * @return An array of an array of values pertaining to player entries
+	 * @return An array of an array of values pertaining to achievment entries
 	 * in the database that match the search terms provided in the options
 	 * array. If no entries are found, it will return an empty array. If there
 	 * was an error processing the request, it will return null.
@@ -270,10 +264,6 @@ public class ExplorerModel {
 			commandString += " where ";
 			
 			for (int i = 0; i < options.length; i++) {
-				//option[0] is type (where, sortBy)
-				//option[1] is value (attr<=5)
-				//String[] option = options[i].toString().split(" ");
-				//commandString += option[1];
 				commandString += options[i].toString();
 				if ( (i+1) < options.length ) {
 					commandString += " and ";
@@ -282,7 +272,6 @@ public class ExplorerModel {
 		}
 		commandString += " order by appID;";
 		System.out.println(commandString);
-
 		try {
 			PreparedStatement commandStatement = con.prepareStatement(commandString, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
 			commandStatement.execute();
@@ -294,12 +283,12 @@ public class ExplorerModel {
 	}
 	
 	/**
-	 * Grabs players from the database and converts values from the resultSet 
+	 * Grabs ownedAchievements from the database and converts values from the resultSet 
 	 * into an array of objects. Parameters subject to change in the future.
 	 *  
 	 * @param steamID The steamID of a player whose applications to retrieve
 	 * @param options A list of parameters used to filter/sort the results
-	 * @return An array of an array of values pertaining to player entries
+	 * @return An array of an array of values pertaining to ownedAchievement entries
 	 * in the database that match the search terms provided in the options
 	 * array. If no entries are found, it will return an empty array. If there
 	 * was an error processing the request, it will return null.
@@ -308,8 +297,7 @@ public class ExplorerModel {
 		String commandString = "select ownedAchievement.appId, application.appName, ownedAchievement.steamId, player.personaName, ownedAchievement.achievementName";
 		commandString += " from ownedAchievement";
 		commandString += " join application on ownedAchievement.appId = application.appId";
-		commandString += " join player on ownedAchievement.steamId = player.steamId";
-		//commandString += " where player.steamId = " + steamId;
+		commandString += " join player on ownedAchievement.steamId = player.steamId ";
 		if(options.length > 0) {
 			commandString += " where ";
 			for (int i = 0; i < options.length; i++) {
@@ -321,7 +309,6 @@ public class ExplorerModel {
 		}
 		commandString += " order by appID;" ;
 		System.out.println(commandString);
-
 		try {
 			PreparedStatement commandStatement = con.prepareStatement(commandString, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
 			commandStatement.execute();
@@ -339,7 +326,7 @@ public class ExplorerModel {
 	 *  
 	 * @param steamID The steamID of a player whose applications to retrieve
 	 * @param options A list of parameters used to filter/sort the results
-	 * @return An array of an array of values pertaining to player entries
+	 * @return An array of an array of values pertaining to owned application entries
 	 * in the database that match the search terms provided in the options
 	 * array. If no entries are found, it will return an empty array. If there
 	 * was an error processing the request, it will return null.
@@ -348,8 +335,7 @@ public class ExplorerModel {
 		String commandString = "select ownedApplication.appId, application.appName, ownedApplication.steamId, player.personaName";
 		commandString += " from ownedApplication";
 		commandString += " join application on ownedApplication.appId = application.appId";
-		commandString += " join player on ownedApplication.steamId = player.steamId";
-		commandString += " where ";
+		commandString += " join player on ownedApplication.steamId = player.steamId ";
 		if(options.length > 0) {
 			commandString += " where ";
 			for (int i = 0; i < options.length; i++) {
@@ -361,7 +347,6 @@ public class ExplorerModel {
 		}
 		commandString += " order by appID;" ;
 		System.out.println(commandString);
-
 		try {
 			PreparedStatement commandStatement = con.prepareStatement(commandString, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
 			commandStatement.execute();
@@ -392,15 +377,15 @@ public class ExplorerModel {
 				
 			}
 			//TODO OH GOD FIX THIS
-			System.out.println(values[i].toString().substring(0, 11));
-			if (values[i].toString().substring(0, 11).equals("timeCreated")) {
-				String temp = values[i].toString();
-				temp = temp.replaceFirst("=", "='");
-				temp = temp.concat("'");
-				updateString += " " + temp;
-			} else {
+//			System.out.println(values[i].toString().substring(0, 11));
+//			if (values[i].toString().substring(0, 11).equals("timeCreated")) {
+//				String temp = values[i].toString();
+//				temp = temp.replaceFirst("=", "='");
+//				temp = temp.concat("'");
+//				updateString += " " + temp;
+//			} else {
 				updateString += " " + values[i];
-			}
+//			}
 		}
 		if (keys.length > 0) {
 			updateString += " where ";
@@ -418,10 +403,6 @@ public class ExplorerModel {
 		PreparedStatement updateStatement = null;
 		try {
 			updateStatement = con.prepareStatement(updateString);
-			//updateStatement.setString(1, entityName);
-			//for(int i = 0; i < values.length; i++) {
-			//	updateStatement.setObject(i+2, values[i]);
-			//}
 			updateStatement.execute();
 			return SystemCode.SUCCESS;
 		}
@@ -458,17 +439,6 @@ public class ExplorerModel {
 		System.out.println(deleteString);
 		try {
 			PreparedStatement deleteStatement = con.prepareStatement(deleteString);
-			//deleteStatement.setObject(1, entityName);
-			//int offset = 2;
-			//if(usingTables.length() > 0) {
-			//	deleteStatement.setString(2, usingTables);
-			//	offset = 3;
-			//}
-			//for(int i = 0; i < primaryKeys.length; i++) {
-			//	System.out.println(primaryKeys[i].toString());
-			//	deleteStatement.setObject(i+offset, primaryKeys[i]);
-			//}
-			System.out.println(deleteStatement);
 			deleteStatement.execute();
 			return SystemCode.SUCCESS;
 		}
@@ -563,6 +533,12 @@ public class ExplorerModel {
 		ExplorerModel.tearDown();
 	}
 	
+	/**
+	 * Returns whether a string starts with a vowel.
+	 * 
+	 * @param s The string to check
+	 * @return Whether it starts with a vowel
+	 */
 	private static boolean startsWithVowel(String s) {
 	 return (s.startsWith ("a") || 
 			 s.startsWith ("e") || 
