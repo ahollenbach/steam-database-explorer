@@ -1,3 +1,5 @@
+package steam.dbexplorer;
+
 /**
  * The system codes enum is used by the interfaces to convey the result of an
  * action.
@@ -5,12 +7,9 @@
  * System codes are success/failure checkable, and an associated message can
  * be retrieved with each code.
  * 
- * @author Andrew Hollenbach <ahollenbach>
+ * @author Andrew Hollenbach (anh7216@rit.edu)
  *
  */
-
-package steam.dbexplorer;
-
 public enum SystemCode {
 	
 	/*Success codes*/
@@ -27,8 +26,9 @@ public enum SystemCode {
 	/** The foreign key was not found. Must couple with alterMessage to give appropriate response*/
 	BAD_FK      ("Cannot find a? that matches the details you gave us! "		,false),
 	/** The value was not of the correct type. Must couple with alterMessage to give appropriate response*/
-	BAD_VALUE   ("Sorry, ? is of the incorrect type."							,false);
-	
+	BAD_VALUE   ("Sorry, ? is of the incorrect type."							,false),
+	ALREADY_EXIST("Sorry, an entry already exists with these attributes."		,false);
+
 	/**
 	 * A message describing the system code.
 	 */

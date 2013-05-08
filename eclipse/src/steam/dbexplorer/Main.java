@@ -1,3 +1,8 @@
+package steam.dbexplorer;
+
+import steam.dbexplorer.controller.ExplorerController;
+import steam.dbexplorer.view.ExplorerView;
+
 /**
  *  Main project file.  Either executes the Steam Database Explorer graphical user interface
  *      or the populate method to populate the database.
@@ -5,12 +10,6 @@
  *  @author Andrew Hollenbach <anh7216@rit.edu>
  *  @author Andrew DeVoe <ard5852@rit.edu>
  */
-
-package steam.dbexplorer;
-
-import steam.dbexplorer.controller.ExplorerController;
-import steam.dbexplorer.view.ExplorerView;
-
 public class Main {
 	
 	public static final String programName = "Steam Database Explorer";

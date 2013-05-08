@@ -140,6 +140,8 @@ public class ExplorerModel {
 			SystemCode r = SystemCode.BAD_VALUE;
 			r.alterMessage(attrName);
 			return r;
+		} else if(message.contains("ERROR: duplicate key")) {
+			return SystemCode.ALREADY_EXIST;
 		}
 		return SystemCode.FAILURE;
 	}
@@ -328,12 +330,15 @@ public class ExplorerModel {
 				where = where.substring(0,orderBy.length()-4);
 				commandString += where;
 			}
+			System.out.println(orderBy);
 			if(orderBy.equals(" order by ")) commandString += " order by " + 
 														defaultSort + ";";
 			else  {
 				orderBy = orderBy.substring(0,orderBy.length()-2);
 				commandString += orderBy;
 			}
+		} else {
+			commandString += " order by " + defaultSort + ";";
 		}
 		return commandString;
 	}

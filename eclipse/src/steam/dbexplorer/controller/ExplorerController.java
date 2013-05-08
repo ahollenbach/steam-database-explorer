@@ -115,15 +115,15 @@ public class ExplorerController {
 	 * @return a systemcode regarding the success/failure of the operation
 	 */
 	public static SystemCode createEntry(String entityName, String[] values) {
+		entityName = DBReference.convertToDBFormat(entityName);
+		
 		int numAttr = DBReference.tableLabels.get(entityName).length;
 		if(numAttr > values.length) { //should never happen
 			String[] valsWithNullStrings = new String[numAttr];
 			for(int i=0;i<values.length;i++) {
 				valsWithNullStrings[i] = values[i]; 
 			}
-		}
-		entityName = DBReference.convertToDBFormat(entityName);
-		
+		}		
 		return ExplorerModel.createEntity(entityName,values);
 	}
 	
@@ -171,7 +171,7 @@ public class ExplorerController {
 			for(int i=0;i<numAttr;i++) {
 				String val = json.getString(attr[i]);
 				if("string".equals(getAttrType(attr[i]))){
-            		val = "\'" + val + "\'";
+            		val = Utils.surroundAndSanitize(val);
             	}
 				values[i] = convertToDbAttr(attr[i]) + "=" + val;
 			}
@@ -201,7 +201,7 @@ public class ExplorerController {
 			for(int i=0;i<numAttr;i++) {
 				String val = json.getString(attr[i]);
 				if("string".equals(getAttrType(attr[i]))){
-            		val = "\'" + val + "\'";
+					val = Utils.surroundAndSanitize(val);
             	}
 				values[i] = dbAttrNoPrefix(attr[i]) + "=" + val;
 			}
@@ -209,7 +209,7 @@ public class ExplorerController {
 			for(int i=0;i<pKeys.length;i++) {
 				String val = json.getString(pKeys[i]);
 				if("string".equals(getAttrType(pKeys[i]))){
-            		val = "\'" + val + "\'";
+					val = Utils.surroundAndSanitize(val);
             	}
 				keys[i] = dbAttrNoPrefix(pKeys[i]) + "=" + val;
 			}

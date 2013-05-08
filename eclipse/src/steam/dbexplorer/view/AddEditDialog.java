@@ -4,12 +4,9 @@ import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
-
-import org.postgresql.util.PSQLException;
 
 import steam.dbexplorer.SystemCode;
 import steam.dbexplorer.controller.ExplorerController;
@@ -17,13 +14,16 @@ import steam.dbexplorer.dbobject.DBReference;
 
 import java.awt.*;
 import java.awt.event.*;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.Set;
  
+/**
+ * AddEditDialog creates a special dialog box. It is generated
+ * specially depending on the table you are adding or editing.
+ *
+ * @author Andrew Hollenbach (anh7216@rit.edu)
+ */
 @SuppressWarnings("serial")
 class AddEditDialog extends JDialog {
-    private JTextField textField;
     private String currentTable;
     private String tableDbString;
  
@@ -31,16 +31,20 @@ class AddEditDialog extends JDialog {
     private String cancelStr = "Cancel";
     private LinkedHashMap<String, JTextField> inputs = new LinkedHashMap<String, JTextField>();
     
+    /**
+     * Creates a new Add and Edit data entries in the tables
+     * 
+     * @param parent The parent frame
+     * @param motherFrame The parent reusults tab
+     * @param tableName The name of a new lable name
+     */
     public AddEditDialog(JFrame parent, final ResultsTab motherFrame, String tableName) {
     	super(parent, true);
     	JPanel main = new JPanel();
     	main.setLayout(new BoxLayout(main, BoxLayout.Y_AXIS));
     	
     	currentTable = tableName;
-    	tableDbString = tableName;
-    	tableDbString = tableDbString.substring(0, tableDbString.length()-1); //remove s
-    	tableDbString = tableDbString.replace(" ", ""); //remove spaces 
-		
+    	tableDbString = DBReference.convertToDBFormat(tableName);
 		
     	String[] attr = DBReference.displayNames.get(tableDbString);
     	for(int i=0;i<attr.length;i++) {
@@ -53,7 +57,6 @@ class AddEditDialog extends JDialog {
     		main.add(p);
     		inputs.put(attr[i], input);
     	}
-        
     	
     	JPanel options = new JPanel();
     	JButton create = new JButton(createStr);
@@ -77,19 +80,14 @@ class AddEditDialog extends JDialog {
 					}
 					results[i] = val;
 					displayResults[i] = tmp;
-					//int idx = getIndex(attrName);
-					//displayResults[idx] = tmp;
-					//results[idx] = val;
 				}
 				
 				SystemCode result = ExplorerController.createEntry(currentTable, results);
 				if(!result.isSuccess()) {
-					JOptionPane.showMessageDialog(null, 
-												  result.getMessage(),
-												  "Insertion Error",
-												  JOptionPane.ERROR_MESSAGE);
+					PopupFactory.errorPopup("Insertion Error", result.getMessage());
 				} else {
 					motherFrame.addElemToTable();
+					AddEditDialog.this.dispose();
 				}
 			}
 		});
@@ -106,17 +104,7 @@ class AddEditDialog extends JDialog {
     	main.setMinimumSize(new Dimension(300,250));
     	this.add(main);
     	this.setMinimumSize(new Dimension(300,250));
+    	this.setTitle("Add new " + tableName);
     	this.setVisible(true);
     }
-    
-    private int getIndex(String attrName) {
-    	String[] attr = DBReference.displayNames.get(tableDbString);
-    	for(int i=0;i<attr.length;i++) {
-    		if(attr[i].equals(attrName)) {
-    			return i;
-    		}
-    	}
-    	return -1;
-    }
-
 }
