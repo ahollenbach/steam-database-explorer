@@ -193,7 +193,6 @@ public class ExplorerController {
 		entityName = DBReference.convertToDBFormat(entityName);
 		String[] attr = DBReference.editableValues.get(entityName);
 		String[] pKeys = DBReference.primaryKeys.get(entityName);
-		String usingTables = DBReference.usingTables.get(entityName);
 		
 		try {
 			int numAttr = attr.length;

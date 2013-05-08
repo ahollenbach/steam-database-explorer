@@ -1,11 +1,3 @@
-/**
- * The explorer model is a model of the database tables in Java. This class 
- * can be used to interface with the PSQL database for all the CRUD operations.
- * 
- *  @author Andrew Hollenbach (anh7216@rit.edu)
- *  @author Andrew DeVoe (ard5852@rit.edu)
- */
-
 package steam.dbexplorer.model;
 
 import java.sql.Connection;
@@ -22,6 +14,13 @@ import steam.dbexplorer.Credentials;
 import steam.dbexplorer.SystemCode;
 import steam.dbexplorer.dbobject.DBReference;
 
+/**
+ * The explorer model is a model of the database tables in Java. This class 
+ * can be used to interface with the PSQL database for all the CRUD operations.
+ * 
+ *  @author Andrew Hollenbach (anh7216@rit.edu)
+ *  @author Andrew DeVoe (ard5852@rit.edu)
+ */
 public class ExplorerModel {
 	
 	static Connection con;
@@ -121,9 +120,6 @@ public class ExplorerModel {
 	private static SystemCode handleInsertUpdateError(String queryString, String table, SQLException ex) {
 		String message = ex.getLocalizedMessage();
 		if(message.contains("foreign key constraint")) {
-			//Pattern p = Pattern.compile("\\([^)]*\\)");
-			//Matcher m = p.matcher(message); trying to get incorrect id using regex
-			//System.out.println(m.group());
 			String failTable = message.substring(message.indexOf("in table \"")+10,message.length()-2);
 			if(startsWithVowel(failTable)) {
 				failTable = "n " + failTable; //proper grammar!
@@ -207,7 +203,6 @@ public class ExplorerModel {
 	public static Object[][] retrieveApplications(Object[] options) {
 		String commandString = "select * from application ";
 		commandString += getWhereAndSort(options,"appId");
-		commandString += ";";
 		try {
 			PreparedStatement commandStatement = con.prepareStatement(commandString, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
 			commandStatement.execute();
@@ -232,7 +227,6 @@ public class ExplorerModel {
 		String commandString = "select achievement.appId, application.appName, achievement.achievementName from achievement";
 		commandString += " join application on achievement.appId = application.appId ";
 		commandString += getWhereAndSort(options,"appId");
-		commandString += ";";
 		try {
 			PreparedStatement commandStatement = con.prepareStatement(commandString, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
 			commandStatement.execute();
@@ -260,7 +254,6 @@ public class ExplorerModel {
 		commandString += " join application on ownedAchievement.appId = application.appId";
 		commandString += " join player on ownedAchievement.steamId = player.steamId ";
 		commandString += getWhereAndSort(options,"appId");
-		commandString += ";" ;
 		try {
 			PreparedStatement commandStatement = con.prepareStatement(commandString, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
 			commandStatement.execute();
@@ -289,7 +282,6 @@ public class ExplorerModel {
 		commandString += " join application on ownedApplication.appId = application.appId";
 		commandString += " join player on ownedApplication.steamId = player.steamId ";
 		commandString += getWhereAndSort(options,"appId");
-		commandString += ";" ;
 		try {
 			PreparedStatement commandStatement = con.prepareStatement(commandString, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
 			commandStatement.execute();
@@ -303,6 +295,8 @@ public class ExplorerModel {
 	/**
 	 * This is a simple method that takes in a list of options created by the 
 	 * controller and returns a string ready to pass to the server
+	 * This GUARANTEES that there will be a trailing semicolon.
+	 * 
 	 * @param options A list of options for the where and sort clauses.
 	 * @param defaultSort If no sort is specified, this is used as the default attribute to sort on
 	 * @return
@@ -321,19 +315,19 @@ public class ExplorerModel {
 				}
 			}
 			if(!where.equals(" where ")) {
-				where = where.substring(0,orderBy.length()-4);
+				where = where.substring(0,where.length()-4);
 				commandString += where;
 			}
-			System.out.println(orderBy);
 			if(orderBy.equals(" order by ")) commandString += " order by " + 
-														defaultSort + ";";
+														defaultSort;
 			else  {
 				orderBy = orderBy.substring(0,orderBy.length()-2);
 				commandString += orderBy;
 			}
 		} else {
-			commandString += " order by " + defaultSort + ";";
+			commandString += " order by " + defaultSort;
 		}
+		commandString += ";";
 		return commandString;
 	}
 	

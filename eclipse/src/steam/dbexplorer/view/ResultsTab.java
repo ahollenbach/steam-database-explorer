@@ -8,6 +8,8 @@ import java.util.Enumeration;
 import java.util.HashSet;
 
 import javax.swing.*;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
@@ -32,6 +34,7 @@ public class ResultsTab extends JPanel {
 	 * GUI elements
 	 */
 	private JButton update;
+	private JButton delete;
 	private JTable results;
 	private JScrollPane scrollPane;
 	private QueryTab queryTab;
@@ -145,8 +148,19 @@ public class ResultsTab extends JPanel {
 				rowsChanged.add(event.getFirstRow());
 			}
 		});
-		System.out.println(tableModel.getRowCount());
 		results.setModel(tableModel);
+		ListSelectionModel selectionModel = results.getSelectionModel();
+		selectionModel.addListSelectionListener(new ListSelectionListener() {
+			@Override
+			public void valueChanged(ListSelectionEvent e) {
+				delete.setEnabled(true);
+			}
+		});
+		
+		if(tableModel.getRowCount() == 0) {
+			delete.setEnabled(false);
+			update.setEnabled(false);
+		}
 	}
 
 	/**
@@ -188,8 +202,8 @@ public class ResultsTab extends JPanel {
         });
 		update.setEnabled(false);
 		p.add(update);
-		JButton delete = new JButton("Remove " + addDeleteWhat);
-		//delete.setEnabled(false);
+		delete = new JButton("Remove " + addDeleteWhat);
+		delete.setEnabled(false);
 		delete.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent ae) {
             	try {

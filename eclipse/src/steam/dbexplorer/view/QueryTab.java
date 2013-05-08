@@ -130,7 +130,6 @@ public class QueryTab extends JPanel {
 		commitButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent ae) {
             	//get common information
-            	String table = (String) currentTableName.getSelectedItem();
             	String type = (String) curType.getSelectedItem();
             	String attr = (String) curAttribute.getSelectedItem();
             	
@@ -336,8 +335,6 @@ public class QueryTab extends JPanel {
 		delete.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent ae) {
             	String selectedValue = (String) constraintsList.getSelectedValue();
-            	System.out.println(selectedValue);
-            	System.out.println(currentConstraints.values());
             	currentConstraints.values().removeAll(Collections.singleton(selectedValue));
             	updateConstraints();
         		constraintsList.validate();
