@@ -21,9 +21,7 @@ import steam.dbexplorer.SystemCode;
 import steam.dbexplorer.dbobject.DBReference;
 import steam.dbexplorer.model.ExplorerModel;
 
-public class ExplorerController {
-	private static HashMap<String, String[]> tableLabels;
-	
+public class ExplorerController {	
 	public static final String[] tableNames = {"Achievements", 
 										  	   "Applications", 
 										  	   "Friends", 
@@ -59,19 +57,6 @@ public class ExplorerController {
 	private String currentTable;
 	
 	public ExplorerController() {
-		// populate tableLabels
-		tableLabels = new HashMap<String, String[]>();
-		String[][] labels = {{"Application ID", "Application Name", "Achievement Name"}, //Achievements
-							 {"Application ID", "Application Name"}, //Applications
-							 {"Steam ID #1", "Steam ID #2"}, //Friends
-							 {"Application ID", "Application Name", "Steam ID", "Persona Name", "Achievement Name"}, //Owned achievements
-							 {"Application ID", "Application Name", "Steam ID", "Persona Name"}, //Owned applications
-							 {"Steam ID", "Persona Name", "Profile URL", "Real Name", "Date Joined"}}; //player
-		for(int i=0;i<tableNames.length;i++) {
-			tableLabels.put(tableNames[i], labels[i]);
-		}
-		
-		
 	}
 	
 	public Object[][] getData(String tableName, String[] options) {
@@ -98,7 +83,8 @@ public class ExplorerController {
 	}
 
 	public String[] getLabels(String tableName) {
-		String[] labels = tableLabels.get(tableName);
+		tableName = DBReference.convertToDBFormat(tableName);
+		String[] labels = DBReference.tableLabels.get(tableName);
 		return labels;
 	}
 	
@@ -111,15 +97,14 @@ public class ExplorerController {
 	 * @return
 	 */
 	public static SystemCode createEntry(String entityName, String[] values) {
-		int numAttr = tableLabels.get(entityName).length;
-		if(numAttr > values.length) {
+		int numAttr = DBReference.tableLabels.get(entityName).length;
+		if(numAttr > values.length) { //should never happen
 			String[] valsWithNullStrings = new String[numAttr];
 			for(int i=0;i<values.length;i++) {
 				valsWithNullStrings[i] = values[i]; 
 			}
 		}
-		entityName = entityName.substring(0, entityName.length()-1); //remove s
-		entityName = entityName.replace(" ", ""); //remove spaces 
+		entityName = DBReference.convertToDBFormat(entityName);
 		
 		return ExplorerModel.createEntity(entityName,values);
 	}
@@ -138,8 +123,7 @@ public class ExplorerController {
 		} catch (JSONException e) {
 		}
 		return SystemCode.FAILURE;*/
-		entityName = entityName.substring(0, entityName.length()-1); //remove s
-		entityName = entityName.replace(" ", ""); //remove space
+		entityName = DBReference.convertToDBFormat(entityName);
 		String[] attr = DBReference.primaryKeys.get(entityName);
 		String usingTables = DBReference.usingTables.get(entityName);
 		
@@ -185,8 +169,7 @@ public class ExplorerController {
 	}
 	
 	public SystemCode updateEntity(String entityName, JSONObject json) {
-		entityName = entityName.substring(0, entityName.length()-1); //remove s
-		entityName = entityName.replace(" ", ""); //remove space
+		entityName = DBReference.convertToDBFormat(entityName);
 		String[] attr = DBReference.editableValues.get(entityName);
 		String[] pKeys = DBReference.primaryKeys.get(entityName);
 		String usingTables = DBReference.usingTables.get(entityName);
