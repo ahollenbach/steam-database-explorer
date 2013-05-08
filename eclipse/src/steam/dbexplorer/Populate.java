@@ -1,9 +1,12 @@
 /**
- * The populate class drops all data from the tables and inserts new test 
- * values. This class can be used for testing, because it will return the 
- * database to a specific state specified by its methods.
+ * The populate class populated the tables with all of the required data
+ * values. It is assumed that the database will be empty, although it may 
+ * be ran if the database has some data preloaded.  The populate method
+ * is coded to be able to get a variable amount of data.
  * 
- * @author Andrew Hollenbach <ahollenbach>
+ *  @author Andrew Hollenbach <anh7216@rit.edu>
+ *  @author Andrew DeVoe <ard5852@rit.edu>
+ *  
  */
 
 package steam.dbexplorer;
@@ -14,7 +17,6 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -28,15 +30,13 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.github.koraktor.steamcondenser.exceptions.WebApiException;
 import com.github.koraktor.steamcondenser.steam.community.SteamGame;
 import com.github.koraktor.steamcondenser.steam.community.SteamId;
 import com.github.koraktor.steamcondenser.steam.community.WebApi;
-import com.github.koraktor.steamcondenser.steam.servers.MasterServer;
 
 public class Populate {
 	
-	private final static int BRANCH = 2; //The produced friendship tree has a radius of BRANCH-1;
+	private final static int BRANCH = 2; //The produced friendship graph has a radius of BRANCH-1;
 	//Thus a BRANCH of 1 gets exactly one person (The center).
 	//  2 gets the center and the centers friends
 	//	3 gets the center, their friends, and their friends of friends
@@ -44,20 +44,51 @@ public class Populate {
 	private final static int VISIBLE = 3; //community visiblity state constants
 	private final static int PRIVATE = 1;
 
+	/**
+	 * Pair is used to insert friendships into the database.
+	 * It is set up such that a Pair object is equal to another
+	 * Pair object if its two contained Id's are equal or
+	 * if they are the reverse.  Thus the follow sets are the
+	 * same.
+	 * (1 , 2) = ( 2 , 1 )
+	 * This class was made for use with a HashedSet
+	 */
 	public static class Pair {
 		long steamId1;
 		long steamId2;
 		
+		/**
+		 * Constructs a pair with the given values.
+		 * 
+		 * @param l1 The first steamId
+		 * @param l2 The second steamId
+		 */
 		public Pair (long l1, long l2) {
 			steamId1 = l1;
 			steamId2 = l2;
 		}
 		
+		/**
+		 * Returns a hashed code for the pair.  It is based on
+		 * the two values of the pair contains.  It is made
+		 * so that a pair which is equal also has the same has
+		 * code (as required by Java Standards)
+		 * 
+		 * @return The hashed code for the pair
+		 */
 		@Override
 		public int hashCode() {
 			return (int) (this.steamId1 * this.steamId2);
 		}
 
+		/**
+		 * Returns whether an object is equal to this Pair object.
+		 * Two Pair objects are equal if they contain the same
+		 * two values in any order.
+		 * 
+		 * @param obj The object to compare to
+		 * @return Whether this object and obj are equal
+		 */
 		@Override
 		public boolean equals(Object obj) {
 			if (!Pair.class.isInstance(obj)) {
@@ -76,6 +107,24 @@ public class Populate {
 		}
 	}
 	
+	/**
+	 * Populates the Player table.  Goes about this task recursively.  
+	 * Continues looking up the steamId provided as longId until the recursive reaches the
+	 * branching factor then stops.  For each person, looks up the users information and stores the
+	 * person, from there looks up their owned games and adds them, and then looks up the apps listed in
+	 * appsAdded for the achievements to look for.  Finally looks up the players friends and returns them when
+	 * done.  The intital person (recursive = 0) then adds all of the friend relationships.  This ensures that
+	 * no friendships are missing due to a person having not yet been added to the database.
+	 * 
+	 * This function can (and will) throw exceptions, as many people whom have friendships referencing them
+	 * will not be in the database.
+	 * 
+	 * @param recursive The recursion factor; stops when this reaches the branching factor
+	 * @param con The connection to the database to add the players too
+	 * @param longId The ID of the player to look up
+	 * @param appsAdded The application to look up owned achievements for
+	 * @return The set of friendships to attempt to add to the database.  May return an empty set
+	 */
 	public static Set<Pair> populatePlayers(int recursive, Connection con, Long longId, List<Integer> appsAdded) {
 		if (recursive == BRANCH) {
 			return new HashSet<Pair>();
@@ -109,6 +158,11 @@ public class Populate {
 					if (rs.getInt("PlayerExists") > 0) {
 						return friendsToAdd; //We already called populatePlayer on this person
 					}
+				} catch (SQLException e) {
+		            e.printStackTrace();
+				}
+				
+				try {
 					id = SteamId.create(longId, true);
 					insertPlayerStatement.setLong(1, id.getSteamId64());
 					insertPlayerStatement.setString(2, id.getNickname());
@@ -139,8 +193,6 @@ public class Populate {
 								insertAppStatement.setLong(2, id.getSteamId64());
 								insertAppStatement.execute();
 								if (appsAdded.contains(owned.getKey())) {
-									
-									
 									try {			
 							            Map<String, Object> param = new HashMap<String,Object>();
 										param.put("appid", owned.getKey());
@@ -148,8 +200,6 @@ public class Populate {
 										param.put("format", "json");
 							            JSONObject jsonData = new JSONObject( WebApi.getJSON("ISteamUserStats", "GetPlayerAchievements", 1, param));
 							            JSONArray achievement = jsonData.getJSONObject("playerstats").getJSONArray("achievements");
-							            
-							            
 							            for (int i = 0; i < achievement.length(); i ++) {
 							            	try {
 								                JSONObject ach = achievement.getJSONObject(i);
@@ -193,11 +243,11 @@ public class Populate {
 							insertFriendStatement.setLong(2, p.steamId2);
 							insertFriendStatement.execute();
 						} catch (Exception e) {
-							//e.printStackTrace();  Errors here are caused due to
+							//Errors here are caused due to
 							//friends of "leaf nodes" in the graph of players not having their friends added
 							//thus they don't exist.  However, can't simply ignore them as they may
 							//have friendships to other "leafs:
-							System.err.println(e.getMessage());;
+							e.printStackTrace();
 						}
 					}
 					return new HashSet<Pair>();
@@ -212,6 +262,13 @@ public class Populate {
 		}
 	}
 	
+	/**
+	 * Populates the Application table.  
+	 * 
+	 * @param con The connection to the database to add data too.
+	 * @return The total list of applications added.  Could be used to act
+	 *     As the list of applications to check for achievements.
+	 */
 	public static List<Long> populateApps(Connection con) {
 		List<Long> appsAdded = new ArrayList<Long>();
 		try {			
@@ -226,7 +283,6 @@ public class Populate {
                 
                 insertStatement.setLong(1, Long.parseLong(app.getString("appid")));
                 insertStatement.setString(2, app.getString("name"));
-
                 try {
                 	insertStatement.execute();
                 	appsAdded.add(Long.parseLong(app.getString("appid")));
@@ -240,8 +296,18 @@ public class Populate {
 		return appsAdded;
 	}
 	
+	/**
+	 * Populates the Achievement table with achievements from the list of applicationId's
+	 * stored in apps.
+	 * 
+	 * @param con  THe connection to the database to add achievements too
+	 * @param apps The list of applicationId to look up achievements for
+	 */
 	public static void populateAchievements(Connection con, List<Integer> apps) {
-		try {			
+		try {		
+            String insertString = "insert into achievement values ( ?, ?);";
+            PreparedStatement insertAchivement = con.prepareStatement(insertString);
+            
 			for (int currentApp = 0; currentApp < apps.size(); currentApp++) {
 				Map<String, Object> param = new HashMap<String,Object>();
 				param.put("gameid", apps.get(currentApp));
@@ -249,15 +315,11 @@ public class Populate {
 	            JSONObject jsonData = new JSONObject( WebApi.getJSON("ISteamUserStats", "GetGlobalAchievementPercentagesForApp", 1, param));
 	            JSONArray achievement = jsonData.getJSONObject("achievementpercentages").getJSONObject("achievements").getJSONArray("achievement");
 	            
-	            String insertString = "insert into achievement values ( ?, ?);";
-	            PreparedStatement insertAchivement = con.prepareStatement(insertString);
-	            
 	            for (int i = 0; i < achievement.length(); i ++) {
 	                try {
 		                JSONObject ach = achievement.getJSONObject(i);
 		                insertAchivement.setLong(1, apps.get(currentApp));
 		                insertAchivement.setString(2, ach.getString("name"));
-
 	                	insertAchivement.execute();
 	                } catch (Exception e) {
 	                	e.printStackTrace();
@@ -269,15 +331,19 @@ public class Populate {
         }
 	}
 	
+	/**
+	 * Populates the database.  Calls the various populate methods in the following order:
+	 * populateApps, populateAchievements, populatePlayers.  The order is important due to
+	 * foreign key dependencies.
+	 * 
+	 */
 	public static void populate() {
 		try {
 			WebApi.setApiKey(Credentials.APIKEY);
-			
 			Connection con;
 			String url = Credentials.DATABASEURL;
 			Class.forName("org.postgresql.Driver");
 			con = DriverManager.getConnection(url, Credentials.DATABASEUSERNAME ,Credentials.DATABASEPASSWORD);
-			
 			List<Integer> appsAdded = new ArrayList<Integer>();
 			
 			//appsAdded.addAll(populateApps(con));  Is what we would do if we wanted to get all of the achievements on Steam
@@ -296,16 +362,16 @@ public class Populate {
 			populateAchievements(con, appsAdded);
 			
 			populatePlayers(0, con, 76561198049281288L, appsAdded);
-			//populatePlayers(0,con,76561197988083973L, appsAdded);
+			populatePlayers(0, con, 76561197988083973L, appsAdded);
+			//Some potential seed values are:
 			//76561197988083973  -  Tonbo
 			//76561197988128323  -  WispingWinds
 			//76561198018660341  -  DROCK
+			//76561198049281288  -  Maddjak
 			
 			con.close();
 		} catch (Exception e) {
 			e.printStackTrace();
-		} finally {
-			
-		}
+		} 
 	}
 }
