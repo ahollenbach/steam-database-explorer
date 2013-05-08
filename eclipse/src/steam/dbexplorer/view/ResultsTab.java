@@ -14,6 +14,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Enumeration;
+import java.util.HashSet;
 
 import javax.swing.*;
 import javax.swing.event.TableModelEvent;
@@ -31,12 +32,13 @@ public class ResultsTab extends JPanel {
 	private ExplorerController controller;
 	private QueryTab queryTab;
 	private JTabbedPane parent;
+	private JButton update;
 	
 	private JTable results;
 	private JScrollPane scrollPane;
 	
 	private String currentTable;
-	private ArrayList<Integer> rowsChanged = new ArrayList<Integer>();
+	private HashSet<Integer> rowsChanged = new HashSet<Integer>();
 	private ArrayList<Integer> notEditableColumns = new ArrayList<Integer>();;
 	
 	public ResultsTab(JTabbedPane parent, ExplorerController controller) {
@@ -85,6 +87,9 @@ public class ResultsTab extends JPanel {
 		tableModel.addTableModelListener(new TableModelListener() {
 			@Override
 			public void tableChanged(TableModelEvent event) {
+				int row = event.getFirstRow();
+				int col = event.getColumn();
+				update.setEnabled(true);
 				rowsChanged.add(event.getFirstRow());
 			}
 		});
@@ -103,7 +108,7 @@ public class ResultsTab extends JPanel {
             }
         });
 		p.add(add);
-		JButton update = new JButton("Update entries");
+		update = new JButton("Commit changes");
 		//update.setEnabled(true);
 		update.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent ae) {
@@ -111,15 +116,17 @@ public class ResultsTab extends JPanel {
             		JSONObject json = new JSONObject();
 	            	for(int row : rowsChanged) {
 	            		for(int col=0;col<results.getColumnCount();col++) {
-		                	json.put(results.getColumnName(col), 
+		                	json.put(results.getColumnName(col),
 		                			 results.getValueAt(row, col));
 		            	}
+	            		controller.updateEntity(currentTable, json);
 	            	}
-	            	controller.updateEntity(currentTable, json);
+	            	update.setEnabled(false);
             	} catch(JSONException e) {
 	            }
             }
         });
+		update.setEnabled(false);
 		p.add(update);
 		JButton delete = new JButton("Remove " + addDeleteWhat);
 		//delete.setEnabled(false);

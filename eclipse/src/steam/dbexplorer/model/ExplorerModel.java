@@ -240,7 +240,7 @@ public class ExplorerModel {
 				}
 			}
 		}
-		commandString += "order by appID;";
+		commandString += " order by appID;";
 		System.out.println(commandString);
 
 		try {
