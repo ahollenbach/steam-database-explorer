@@ -1,3 +1,10 @@
+/**
+ * AddEditDialog creates a special dialog box. It is generated
+ * specially depending on the table you are adding or editing.
+ *
+ *  @author Andrew Hollenbach <anh7216@rit.edu>
+ *  @author Andrew DeVoe <ard5852@rit.edu>
+ */
 package steam.dbexplorer.view;
 
 import javax.swing.BoxLayout;
@@ -17,12 +24,6 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.LinkedHashMap;
  
-/**
- * AddEditDialog creates a special dialog box. It is generated
- * specially depending on the table you are adding or editing.
- *
- * @author Andrew Hollenbach (anh7216@rit.edu)
- */
 @SuppressWarnings("serial")
 class AddEditDialog extends JDialog {
     private String currentTable;

@@ -1,3 +1,10 @@
+/**
+ * The explorer model is a model of the database tables in Java. This class 
+ * can be used to interface with the PSQL database for all the CRUD operations.
+ * 
+ *  @author Andrew Hollenbach <anh7216@rit.edu>
+ *  @author Andrew DeVoe <ard5852@rit.edu>
+ */
 package steam.dbexplorer.model;
 
 import java.sql.Connection;
@@ -14,13 +21,6 @@ import steam.dbexplorer.Credentials;
 import steam.dbexplorer.SystemCode;
 import steam.dbexplorer.dbobject.DBReference;
 
-/**
- * The explorer model is a model of the database tables in Java. This class 
- * can be used to interface with the PSQL database for all the CRUD operations.
- * 
- *  @author Andrew Hollenbach (anh7216@rit.edu)
- *  @author Andrew DeVoe (ard5852@rit.edu)
- */
 public class ExplorerModel {
 	
 	static Connection con;

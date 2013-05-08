@@ -1,3 +1,11 @@
+/**
+ * QueryTab is a tab that goes into ExplorerView. It is used
+ * to select the table to view and constraints to apply to that 
+ * table.
+ * 
+ *  @author Andrew Hollenbach <anh7216@rit.edu>
+ *  @author Andrew DeVoe <ard5852@rit.edu>
+ */
 package steam.dbexplorer.view;
 
 import java.awt.Dimension;
@@ -15,13 +23,6 @@ import javax.swing.event.ListSelectionListener;
 import steam.dbexplorer.Utils;
 import steam.dbexplorer.controller.ExplorerController;
 
-/**
- * QueryTab is a tab that goes into ExplorerView. It is used
- * to select the table to view and constraints to apply to that 
- * table.
- *
- * @author Andrew Hollenbach (anh7216)
- */
 @SuppressWarnings("serial")
 public class QueryTab extends JPanel {
 	private JComboBox currentTableName;

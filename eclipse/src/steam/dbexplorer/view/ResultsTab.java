@@ -1,3 +1,12 @@
+/**
+ * ResultsTab is a tab that goes into ExplorerView. It is used
+ * to view the results of a query defined in the query tab. From 
+ * this view, a user can also execute Create, Update, and Delete
+ * commands on the data they are viewing.
+ *
+ *  @author Andrew Hollenbach <anh7216@rit.edu>
+ *  @author Andrew DeVoe <ard5852@rit.edu>
+ */
 package steam.dbexplorer.view;
 
 import java.awt.event.ActionEvent;
@@ -20,14 +29,6 @@ import org.json.JSONObject;
 import steam.dbexplorer.controller.ExplorerController;
 import steam.dbexplorer.dbobject.DBReference;
 
-/**
- * ResultsTab is a tab that goes into ExplorerView. It is used
- * to view the results of a query defined in the query tab. From 
- * this view, a user can also execute Create, Update, and Delete
- * commands on the data they are viewing.
- *
- * @author Andrew Hollenbach (anh7216@rit.edu)
- */
 @SuppressWarnings("serial")
 public class ResultsTab extends JPanel {
 	/*

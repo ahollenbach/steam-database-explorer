@@ -1,3 +1,13 @@
+/**
+ * The explorer controller is used to interface between the model and the view.
+ * The controller is in charge of checking that all input taken from the view
+ * makes sense, and converting information from the model into a type preferred
+ * by the view.
+ * 
+ *  @author Andrew Hollenbach <anh7216@rit.edu>
+ *  @author Andrew DeVoe <ard5852@rit.edu>
+ */
+
 package steam.dbexplorer.controller;
 
 import java.util.HashMap;
@@ -9,15 +19,6 @@ import steam.dbexplorer.SystemCode;
 import steam.dbexplorer.Utils;
 import steam.dbexplorer.dbobject.DBReference;
 import steam.dbexplorer.model.ExplorerModel;
-
-/**
- * The explorer controller is used to interface between the model and the view.
- * The controller is in charge of checking that all input taken from the view
- * makes sense, and converting information from the model into a type preferred
- * by the view.
- * 
- * @author Andrew Hollenbach (anh7216@rit.edu)
- */
 
 public class ExplorerController {	
 	public static final String[] tableNames = {"Achievements", 
@@ -80,10 +81,8 @@ public class ExplorerController {
 		} else if(tableName.equals("Friends")) {
 			data = ExplorerModel.retrieveFriends(options);
 		} else if(tableName.equals("Owned Achievements")) {
-			//data = ExplorerModel.retrieveOwnedAchievements(76561198049281288L, options);
 			data = ExplorerModel.retrieveOwnedAchievements(options);
 		} else if(tableName.equals("Owned Applications")) {
-			//data = ExplorerModel.retrieveOwnedApplications(76561198049281288L, options);
 			data = ExplorerModel.retrieveOwnedApplications(options);
 		} else if(tableName.equals("Players")) {
 			data = ExplorerModel.retrievePlayers(options);
@@ -231,7 +230,7 @@ public class ExplorerController {
 	 * </pre>
 	 */
 	public static String convertToDbAttr(String orig) {
-		//SO YUCKY GET RID OF THIS
+		//TODO:Possible clean up
 		HashMap<String, String> values = new HashMap<String, String>();
 		values.put("Steam ID", "player.steamId");
 		values.put("Persona Name", "player.personaName");
@@ -260,7 +259,7 @@ public class ExplorerController {
 	 * </pre>
 	 */
 	public static String dbAttrNoPrefix(String orig) {
-		//SO YUCKY GET RID OF THIS
+		//Todo: Possibly Clean up
 		HashMap<String, String> values = new HashMap<String, String>();
 		values.put("Steam ID", "steamId");
 		values.put("Persona Name", "personaName");
@@ -283,7 +282,7 @@ public class ExplorerController {
 	 * @return The type of that attribute as a string [string,long]
 	 */
 	public static String getAttrType(String orig) {
-		//SO YUCKY GET RID OF THIS TOO
+		//Todo: Possibly Clean up
 		HashMap<String, String> values = new HashMap<String, String>();
 		values.put("Steam ID", "long");
 		values.put("Persona Name", "string");

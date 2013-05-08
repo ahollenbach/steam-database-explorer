@@ -1,14 +1,15 @@
-package steam.dbexplorer.dbobject;
-
-import java.util.HashMap;
-
 /**
  * This is a static reference class to the DDL. Every hashmap can be keyed 
  * using values from the tableNames array.
  * All values are in their human-readable form.
  * 
- * @author Andrew Hollenbach (anh7216@rit.edu)
+ *  @author Andrew Hollenbach <anh7216@rit.edu>
+ *  @author Andrew DeVoe <ard5852@rit.edu>
  */
+package steam.dbexplorer.dbobject;
+
+import java.util.HashMap;
+
 public class DBReference {
 	/**
 	 * This stores a list of the column labels for each table that are to be

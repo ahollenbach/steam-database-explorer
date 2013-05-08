@@ -1,3 +1,10 @@
+/**
+ * The explorer view is used to convey the database information to the user.
+ * It also supports the CRUD operations on all the data.
+ *
+ *  @author Andrew Hollenbach <anh7216@rit.edu>
+ *  @author Andrew DeVoe <ard5852@rit.edu>
+ */
 package steam.dbexplorer.view;
 
 import java.awt.Dimension;
@@ -6,12 +13,6 @@ import javax.swing.*;
 import steam.dbexplorer.Main;
 import steam.dbexplorer.controller.ExplorerController;
 
-/**
- * The explorer view is used to convey the database information to the user.
- * It also supports the CRUD operations on all the data.
- * 
- * @author Andrew Hollenbach (anh7216@rit.edu)
- */
 public class ExplorerView {
 	
 	/**
