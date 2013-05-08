@@ -9,6 +9,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import steam.dbexplorer.SystemCode;
+import steam.dbexplorer.Utils;
 import steam.dbexplorer.controller.ExplorerController;
 import steam.dbexplorer.dbobject.DBReference;
 
@@ -76,7 +77,7 @@ class AddEditDialog extends JDialog {
 						val = null;
 					} else if("string".equals(ExplorerController.getAttrType(attrName)) && val != null ) {
 						tmp = val;
-						val = "'" + val + "'";
+						val = Utils.surroundAndSanitize(val);
 					}
 					results[i] = val;
 					displayResults[i] = tmp;

@@ -101,7 +101,7 @@ public class ExplorerController {
 	 */
 	public String[] getLabels(String tableName) {
 		tableName = DBReference.convertToDBFormat(tableName);
-		String[] labels = DBReference.displayNames.get(tableName);
+		String[] labels = DBReference.tableLabels.get(tableName);
 		return labels;
 	}
 	
