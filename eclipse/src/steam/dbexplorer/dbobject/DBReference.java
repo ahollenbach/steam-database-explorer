@@ -1,15 +1,14 @@
+package steam.dbexplorer.dbobject;
+
+import java.util.HashMap;
+
 /**
  * This is a reference class to the DDL. Every attribute is in the order that
  * it is in the database. A Disp ending means that the attributes are in the
  * format they are displayed in to the user.
  * 
- * @author Andrew Hollenbach <ahollenbach>
+ * @author Andrew Hollenbach (anh7216@rit.edu)
  */
-
-package steam.dbexplorer.dbobject;
-
-import java.util.HashMap;
-
 public class DBReference {
 	public static HashMap<String, String[]> displayNames = new HashMap<String, String[]>();
 	public static HashMap<String, String[]> editableValues = new HashMap<String, String[]>();
@@ -55,12 +54,11 @@ public class DBReference {
 		tableLabels.put("OwnedApplication", new String[] {"Application ID", "Application Name", "Steam ID", "Persona Name"});
 	}
 	
-	public static Boolean isPK(String tableName,String attrName) {
+	public static Boolean isPrimaryKey(String tableName,String attrName) {
 		if(tableName == null) {
 			return false;
 		} else {
-			tableName = tableName.substring(0, tableName.length()-1); //remove s
-			tableName = tableName.replace(" ", ""); //remove spaces 
+			tableName = convertToDBFormat(tableName);
 			return contains(primaryKeys.get(tableName), attrName);
 		}
 	}

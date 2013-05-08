@@ -306,6 +306,13 @@ public class ExplorerModel {
 		}
 	}
 	
+	/**
+	 * This is a simple method that takes in a list of options created by the 
+	 * controller and returns a string ready to pass to the server
+	 * @param options A list of options for the where and sort clauses.
+	 * @param defaultSort If no sort is specified, this is used as the default attribute to sort on
+	 * @return
+	 */
 	private static String getWhereAndSort(Object[] options, String defaultSort) {
 		String commandString = "";
 		if (options.length > 0) {
@@ -482,31 +489,6 @@ public class ExplorerModel {
 			}
 		}
 		return stringsToReturn;
-	}
-	
-	//For (basic) testing
-	public static void main(String[] args) {
-		ExplorerModel.setUp();
-		
-		Object[] options = new Object[1];
-		String selection = "steamId = 76561197988083973";
-		//String selection = "personaName = 'Jeckel'";
-		options[0] = (Object) selection;
-		
-		//Object[][] rv = ExplorerModel.retrievePlayers(options);
-		//Object[][] rv = ExplorerModel.retrieveOwnedApplications(76561197988083973L, new Object[0][0]);
-		/*
-		Object[] aRow = rv[0];
-		for (int i = 0; i < aRow.length; i++) {
-			if (aRow[i] != null) {
-			System.out.print(aRow[i].toString() + " - ");
-			} 
-			else {
-				System.out.println("Null");
-			}
-		}*/
-		
-		ExplorerModel.tearDown();
 	}
 	
 	/**

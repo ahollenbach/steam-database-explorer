@@ -1,10 +1,3 @@
-/**
- * The explorer view is used to convey the database information to the user.
- * It also supports the CRUD operations on all the data.
- * 
- * @author Andrew Hollenbach <ahollenbach>
- */
-
 package steam.dbexplorer.view;
 
 import java.awt.Dimension;
@@ -17,8 +10,17 @@ import javax.swing.filechooser.FileSystemView;
 import steam.dbexplorer.Main;
 import steam.dbexplorer.controller.ExplorerController;
 
+/**
+ * The explorer view is used to convey the database information to the user.
+ * It also supports the CRUD operations on all the data.
+ * 
+ * @author Andrew Hollenbach (anh7216@rit.edu)
+ */
 public class ExplorerView {
 	
+	/**
+	 * A reference to the controller of the ExplorerView.
+	 */
 	private ExplorerController controller;
 	
 	/*
@@ -38,6 +40,10 @@ public class ExplorerView {
 		this.controller = controller;
 	}
 	
+	/**
+	 * Launches the GUI for the Steam Database Explorer. Closing this
+	 * window will terminate the program.
+	 */
 	public void start() {
 		frame = new JFrame(Main.programName);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -49,15 +55,22 @@ public class ExplorerView {
 		frame.setVisible(true);
 	}
 	
+	/**
+	 * Sets the look and feel to match the system. If it is unable
+	 * to find the system's preferred look and feel, it uses the
+	 * default Java look and feel.
+	 */
 	private void setLaF() {
 		try {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 		} catch (Exception e) {
-			e.printStackTrace();
 		}
 	}
 	
-	
+	/**
+	 * Builds the "Build a Query" and "Results" tabs and
+	 * adds them to the view.
+	 */
 	private void buildTabs() {
 		tabs = new JTabbedPane();
 		
@@ -72,15 +85,4 @@ public class ExplorerView {
 		resultPanel.setQueryPanelRef(queryPanel);
 		queryPanel.setResultsPanelRef(resultPanel);
 	}
-	
-	@SuppressWarnings("unused")
-	protected JComponent makeTextPanel(String text) {
-        JPanel panel = new JPanel(false);
-        JLabel filler = new JLabel(text);
-        filler.setHorizontalAlignment(JLabel.CENTER);
-        panel.setLayout(new GridLayout(1, 1));
-        panel.add(filler);
-        return panel;
-    }
-
 }

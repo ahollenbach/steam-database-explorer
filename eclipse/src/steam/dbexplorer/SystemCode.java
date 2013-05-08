@@ -22,12 +22,16 @@ public enum SystemCode {
 	FAILURE			("The operation was completed unsuccessfully."	,false),
 	
 	/*Database codes*/
-	//TODO Drill down and return more explicit database errors.
 	DB_SUCCESS	("The database operation was completed successfully."	 		,true),
 	DB_ERROR	("The database operation was not completed successfully" 		,false),
+	/** The foreign key was not found. Must couple with alterMessage to give appropriate response*/
 	BAD_FK      ("Cannot find a? that matches the details you gave us! "		,false),
+	/** The value was not of the correct type. Must couple with alterMessage to give appropriate response*/
 	BAD_VALUE   ("Sorry, ? is of the incorrect type."							,false);
 	
+	/**
+	 * A message describing the system code.
+	 */
 	private String message;
 	/**
 	 * True if success code
