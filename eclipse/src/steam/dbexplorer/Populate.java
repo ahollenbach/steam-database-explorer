@@ -332,8 +332,114 @@ public class Populate {
 	}
 	
 	/**
+	 * Populates the database connected to by con with the required tables to fill with
+	 * SteamDatabaseExplorer data.  If these tables already exist, they are first dropped.
+	 * 
+	 * @param con
+	 */
+	public static void populateTables(Connection con){
+		String drop = "drop table if exists Player cascade;"
+		+ " drop table if exists Friend cascade;"
+		+ " drop function if exists symmetric_i() cascade;"
+		+ " drop function if exists symmetric_d() cascade;"
+		+ " drop table if exists Application cascade;"
+		+ " drop table if exists Achievement cascade;"
+		+ " drop table if exists OwnedAchievement cascade;"
+		+ " drop table if exists OwnedApplication cascade;";
+		
+		String createPlayerTable = "create table Player ("
+		+ "steamId				bigint,"
+		+ "personaName			varchar(32) not null,"	
+		+ "profileUrl			varchar(128) not null,"
+		+ "realName			varchar(64),"
+		+ "timeCreated			date,"
+		+ "primary key (steamId));";
+
+		String createFriendTable = "create table Friend ("
+		+ "steamId1			bigint,"
+		+ "steamId2			bigint,"
+		+ "primary key (steamId1, steamId2),"
+		+ "foreign key (steamId1) references player(steamId)"
+        	+ " on delete cascade,"
+		+ "foreign key (steamId2) references player(steamId)"
+			+ " on delete cascade);";
+		
+		String createTrigger1 = ""
+		+ "create function symmetric_i() returns trigger as $symmetric_i$"
+		+ " begin "
+		+ " if not new.steamId1 in (select steamId2 from Friend where steamId1 = new.steamId2) "
+		+ "	then "
+		+ " insert into Friend (steamId1, steamId2) values (new.steamId2, new.steamId1); end if; "
+		+ " return null; end; "
+		+ " $symmetric_i$ Language plpgsql; "
+
+		+ "create trigger symmetric_insert after insert on Friend"
+		+ " for each row execute procedure symmetric_i();";
+
+		String createTrigger2 = ""
+		+ "create function symmetric_d() returns trigger as $symmetric_d$"
+		+ " begin "
+		+ "	delete from Friend "
+		+ " where (steamId1 = old.steamId2) and (steamId2 = old.steamId1);"
+        + " return null; end; "
+		+ " $symmetric_d$ Language plpgsql;"
+
+		+ " create trigger symmetric_delete after delete on Friend"
+		+ " for each row execute procedure symmetric_d();";
+
+
+		String createApplicationTable = "create table Application ("
+		+ "	appId				bigint,"
+		+ "	appName				varchar(1024) not null, "
+		+ "	primary key (appId));";
+
+		String createAchievementTable = "create table Achievement ("
+		+ "	appId				bigint, "
+		+ "	achievementName			varchar(1024),"
+		+ "	primary key (appId, achievementName),"
+		+ "	foreign key (appId) references Application(appId)"
+			+ " on delete cascade);";
+
+		String createOwnedAch  = "create table OwnedAchievement ("
+		+ "	appId				bigint,"
+		+ "	achievementName			varchar(1024),"
+		+ "	steamId				bigint,"
+		+ "	primary key (appId, achievementName, steamId),"
+		+ "	foreign key (appId, achievementName) references Achievement(appId, achievementName)"
+			+ "	on delete cascade,"
+		+ " foreign key (steamId) references player(steamId)"
+			+ " on delete cascade);";
+
+		String createdOwnedApp = "create table OwnedApplication ("
+		+ "	appId				bigint,"
+		+ "	steamId				bigint,"
+		+ "	primary key (appId, steamId),"
+		+ "	foreign key (appId) references Application(appId)"
+			+ "	on delete cascade,"
+		+ "	foreign key (steamId) references player(steamId)"
+			+ "	on delete cascade);";
+		
+		try {
+			PreparedStatement dropState = con.prepareStatement(drop);
+			PreparedStatement createPlayerTableState = con.prepareStatement(createPlayerTable);
+			PreparedStatement createFriendTableState = con.prepareStatement(createFriendTable);
+			PreparedStatement createTrigger1State = con.prepareStatement(createTrigger1);
+			PreparedStatement createTrigger2State = con.prepareStatement(createTrigger2);
+			PreparedStatement createApplicationTableState = con.prepareStatement(createApplicationTable);
+			PreparedStatement createAchievementTableState = con.prepareStatement(createAchievementTable);
+			PreparedStatement createdOwnedAppState = con.prepareStatement(createdOwnedApp);
+			PreparedStatement createOwnedAchState = con.prepareStatement(createOwnedAch);
+			
+			//dropState.execute();
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	/**
 	 * Populates the database.  Calls the various populate methods in the following order:
-	 * populateApps, populateAchievements, populatePlayers.  The order is important due to
+	 * populateTables, populateApps, populateAchievements, populatePlayers.  The order is important due to
 	 * foreign key dependencies.
 	 * 
 	 */
@@ -344,8 +450,9 @@ public class Populate {
 			String url = Credentials.DATABASEURL;
 			Class.forName("org.postgresql.Driver");
 			con = DriverManager.getConnection(url, Credentials.DATABASEUSERNAME ,Credentials.DATABASEPASSWORD);
-			List<Integer> appsAdded = new ArrayList<Integer>();
 			
+			populateTables(con);
+			List<Integer> appsAdded = new ArrayList<Integer>();
 			//appsAdded.addAll(populateApps(con));  Is what we would do if we wanted to get all of the achievements on Steam
 			populateApps(con);
 			appsAdded.add(70);    //Half Life (has no achievements)
