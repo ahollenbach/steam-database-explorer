@@ -1,8 +1,5 @@
 package steam.dbexplorer;
 
-import steam.dbexplorer.controller.ExplorerController;
-import steam.dbexplorer.view.ExplorerView;
-
 /**
  * Utils is a general utility class that has additional general functionality methods that assist the program.
  *
@@ -20,12 +17,26 @@ public class Utils {
 		return "\'" + val + "\'";
 	}
 	
+	/**
+	 * Sanitizes the string (that is, escapes any single quotes), the
+	 * surrounds the string with single quotes.
+	 * 
+	 * @param val a string to sanitize and surround with quotes
+	 * @return The inputted string with all single quotes escaped, then
+	 * surrounded by single quotes.
+	 */
 	public static String surroundAndSanitize(String val) {
 		val = sanitize(val);
 		val = surroundWithQuotes(val);
 		return val;
 	}
 	
+	/**
+	 * Sanitizes the string (that is, escapes any single quotes).
+	 * 
+	 * @param s a string to sanitize
+	 * @return The inputted string with all single quotes escaped
+	 */
 	public static String sanitize(String s) {
 		String[] valArr = s.split("'");
 		s = "";
@@ -34,9 +45,5 @@ public class Utils {
 			else s += valArr[i] + "\\\'";
 		}
 		return s;
-	}
-	
-	public static void main(String[] args) {
-		surroundAndSanitize("a big' fox");
 	}
 }
