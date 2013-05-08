@@ -430,7 +430,15 @@ public class Populate {
 			PreparedStatement createdOwnedAppState = con.prepareStatement(createdOwnedApp);
 			PreparedStatement createOwnedAchState = con.prepareStatement(createOwnedAch);
 			
-			//dropState.execute();
+			dropState.execute();
+			createPlayerTableState.execute();
+			createFriendTableState.execute();
+			createTrigger1State.execute();
+			createTrigger2State.execute();
+			createApplicationTableState.execute();
+			createAchievementTableState.execute();
+			createdOwnedAppState.execute();
+			createOwnedAchState.execute();
 			
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -452,6 +460,7 @@ public class Populate {
 			con = DriverManager.getConnection(url, Credentials.DATABASEUSERNAME ,Credentials.DATABASEPASSWORD);
 			
 			populateTables(con);
+			
 			List<Integer> appsAdded = new ArrayList<Integer>();
 			//appsAdded.addAll(populateApps(con));  Is what we would do if we wanted to get all of the achievements on Steam
 			populateApps(con);
@@ -475,7 +484,6 @@ public class Populate {
 			//76561197988128323  -  WispingWinds
 			//76561198018660341  -  DROCK
 			//76561198049281288  -  Maddjak
-			
 			con.close();
 		} catch (Exception e) {
 			e.printStackTrace();
