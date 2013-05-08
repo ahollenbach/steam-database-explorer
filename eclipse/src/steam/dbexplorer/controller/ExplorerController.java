@@ -197,11 +197,15 @@ public class ExplorerController {
 			int numAttr = attr.length;
 			String[] values = new String[attr.length];
 			for(int i=0;i<numAttr;i++) {
-				String val = json.getString(attr[i]);
-				if("string".equals(getAttrType(attr[i]))){
-					val = Utils.surroundAndSanitize(val);
-            	}
-				values[i] = dbAttrNoPrefix(attr[i]) + "=" + val;
+				try {
+					String val = json.getString(attr[i]);
+					if("string".equals(getAttrType(attr[i]))){
+						val = Utils.surroundAndSanitize(val);
+	            	}
+					values[i] = dbAttrNoPrefix(attr[i]) + "=" + val;
+				} catch (JSONException e) {
+					values[i] = dbAttrNoPrefix(attr[i]) + " = NULL ";
+				}
 			}
 			String[] keys = new String[attr.length];
 			for(int i=0;i<pKeys.length;i++) {
