@@ -1,33 +1,28 @@
-/**
- * QueryTab.java is a tab that goes into ExplorerView. It is used
- * to select the table to view and constraints to apply to that 
- * table.
- *
- * @author Andrew Hollenbach <anh7216> 
- */
-
 package steam.dbexplorer.view;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Dictionary;
 import java.util.Enumeration;
 import java.util.Hashtable;
 
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import javax.swing.table.DefaultTableModel;
 
+import steam.dbexplorer.Utils;
 import steam.dbexplorer.controller.ExplorerController;
 
+/**
+ * QueryTab is a tab that goes into ExplorerView. It is used
+ * to select the table to view and constraints to apply to that 
+ * table.
+ *
+ * @author Andrew Hollenbach (anh7216)
+ */
+@SuppressWarnings("serial")
 public class QueryTab extends JPanel {
 	private JComboBox currentTableName;
 	private JComboBox curType;
@@ -38,7 +33,7 @@ public class QueryTab extends JPanel {
 	private JPanel ops;
 	private JTextField curVal;
 	private JPanel value;
-	private JPanel selectionPanel;
+	private JPanel filterBuilder;
 	private ExplorerController controller;
 	private ResultsTab resultsTab;
 	private JTabbedPane parent;
@@ -47,7 +42,10 @@ public class QueryTab extends JPanel {
 	private JButton clear;
 	//private JButton edit;
 	
-	//HashTable<queryPart,humanReadablePart>
+	/**
+	 * The hashtable stores the current constraints. It stores the
+	 * query string as the key and the human readable string as the value.
+	 */
 	private Hashtable<String,String> currentConstraints = new Hashtable<String,String>();
 	
 	public QueryTab(JTabbedPane parentPane, ExplorerController controller) {
@@ -56,43 +54,39 @@ public class QueryTab extends JPanel {
 		this.parent = parentPane;
 		this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 		
-		JPanel pickTable = createPickTable();
+		//create the table select dropdown
+		JPanel tableSelectPanel = createTableSelectPanel();
 		
-		/* TODO select only particular attributes, i.e. select only steamID and 
-		 * personaName of player
-		JPanel selectAttributes = new JPanel();
-		JTextField attrTitle = new JTextField("Select attributes to retrieve");
-		pickTable.add(title1); 		*/
+		//create the list of active constraints
 		JPanel constraintsPanel = createConstraintsPanel();
 		
-		selectionPanel = createSelectionPanel();
+		//create the create/edit filter form
+		filterBuilder = createFilterBuilder();
+		
+		//run button
 		JButton runQuery = new JButton ("Run");
 		runQuery.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent ae) {
             	String table = (String) currentTableName.getSelectedItem();
             	resultsTab.updateTable(table,currentConstraints.keys());
-            	parent.setSelectedIndex(1);
+            	parent.setSelectedIndex(1); //switch to results tab
             }
         });	
 		
-		this.add(pickTable);
+		this.add(tableSelectPanel);
 		this.add(constraintsPanel);
-		this.add(selectionPanel);
+		this.add(filterBuilder);
 		this.add(new JPanel()); //spacer
 		this.add(runQuery);
 	}
 
 	
-	private JPanel createSelectionPanel() {
+	private JPanel createFilterBuilder() {
 		JPanel p = new JPanel();
 		p.setLayout(new BoxLayout(p, BoxLayout.Y_AXIS));
 		
-		JPanel attr = createLabelComboBoxPair("Attribute: ",curAttribute = new JComboBox(controller.getLabels((String) currentTableName.getSelectedItem())));
-		curAttribute.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent ae) {
-            	String table = (String) currentTableName.getSelectedItem();
-            }
-        });
+		JPanel attr = createLabelComboBoxPair("Attribute: ",
+				curAttribute = new JComboBox(controller.getLabels((String) currentTableName.getSelectedItem())));
 		order  = createLabelComboBoxPair("Order: ", curOrder = new JComboBox(ExplorerController.supportedOrders));
 		order.setVisible(false);
 		ops  = createLabelComboBoxPair("Operator: ", curOperation = new JComboBox(ExplorerController.operators));
@@ -125,49 +119,38 @@ public class QueryTab extends JPanel {
 		JButton commitButton = new JButton("Go");
 		commitButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent ae) {
-            	// - q prefix means it is used for the query
-            	// - no prefix means it is used for human readable format or is
-            	//   used for both
+            	//get common information
             	String table = (String) currentTableName.getSelectedItem();
             	String type = (String) curType.getSelectedItem();
             	String attr = (String) curAttribute.getSelectedItem();
-            	if(((String) curType.getSelectedItem()).equals("Where")) {
+            	
+            	if(type.equals("Where")) {
 	            	String op   = (String) curOperation.getSelectedItem();
-	            	String qOp   = controller.opEquivs[curOperation.getSelectedIndex()];
+	            	String queryOp = ExplorerController.opEquivs[curOperation.getSelectedIndex()];
 	            	String val  = curVal.getText();
 	            	
-	            	if(val.length() == 0) {
-	            		JOptionPane.showMessageDialog(null,
-	            			    "Please fill out all values.",
-	            			    "Value Missing!",
-	            			    JOptionPane.ERROR_MESSAGE);
+	            	if(val.length() == 0) { //didn't fill everything out!
+	            		PopupFactory.errorPopup("Please fill out all values.", "Value Missing!");
 	            		return;
 	            	} 
-	            	if("string".equals(controller.getAttrType(attr))){
-	            		val = "\'" + val + "\'";
+	            	if("string".equals(ExplorerController.getAttrType(attr))){
+	            		val = Utils.surroundWithQuotes(val);
 	            	}
-	            	// #breakinMVC #yolo #TODO refactor
-	            	//String qString = type + " " + controller.convertToDbAttr(attr) + qOp + val;
-	            	String qString = " " + controller.convertToDbAttr(attr) + qOp + val;
+	            	String queryString = " " + ExplorerController.convertToDbAttr(attr) + queryOp + val;
 	            	String displayString = type + " " + attr + " is " + op + " " + val;
-	            	currentConstraints.put(qString, displayString);
+	            	currentConstraints.put(queryString, displayString);
             	} else { //sort by
             		String order   = (String) curOrder.getSelectedItem();
-            		String qOrd = null;
-            		if(order.equals("Ascending")) {
-            			qOrd = "asc";
-            		} else {
-            			qOrd = "desc";
-            		}
+            		String qOrd = order.equals("Ascending") ? "asc" : "desc";
             		
-	            	String qString = "sort=" + controller.convertToDbAttr(attr) + " " + qOrd;
+	            	String qString = "sort=" + ExplorerController.convertToDbAttr(attr) + " " + qOrd;
 	            	String displayString = "Sort by " + attr + " in " + order + " order";
 	            	
 	            	//check if you are already sorting on this attribute.
 	            	Enumeration<String> keys = currentConstraints.keys();
 	            	while(keys.hasMoreElements()) {
 	            		String key = keys.nextElement();
-	            		if(key.contains("sort=" + controller.convertToDbAttr(attr))) {
+	            		if(key.contains("sort=" + ExplorerController.convertToDbAttr(attr))) {
 	            			JOptionPane.showMessageDialog(null,
 		            			    "You are already sorting on this attribute!",
 		            			    "Unable to add sort!",
@@ -179,7 +162,7 @@ public class QueryTab extends JPanel {
             	}
             	
             	updateConstraints();
-            	selectionPanel.setVisible(false);
+            	filterBuilder.setVisible(false);
             	
         		//edit.setEnabled(false);
         		delete.setEnabled(false);
@@ -190,7 +173,7 @@ public class QueryTab extends JPanel {
 		JButton cancel = new JButton("Cancel");
 		cancel.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent ae) {
-            	selectionPanel.setVisible(false);
+            	filterBuilder.setVisible(false);
             }
         });
 		actions.add(cancel);
@@ -221,7 +204,7 @@ public class QueryTab extends JPanel {
 		return createLabelComboBoxPair(title, new JComboBox(supportedclauses));
 	}
 
-	private JPanel createPickTable() {
+	private JPanel createTableSelectPanel() {
 		JPanel pickTable = new JPanel();
 		JLabel pickTableTitle = new JLabel("Choose a table");
 		currentTableName = new JComboBox(ExplorerController.tableNames);
@@ -300,7 +283,7 @@ public class QueryTab extends JPanel {
 		JButton add = new JButton("Add new " + addDeleteWhat);
 		add.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent ae) {
-            	selectionPanel.setVisible(true);
+            	filterBuilder.setVisible(true);
             	clear.setEnabled(true);
             }
         });
