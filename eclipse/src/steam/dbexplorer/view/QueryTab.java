@@ -308,6 +308,8 @@ public class QueryTab extends JPanel {
     		//edit.setEnabled(false);
     		delete.setEnabled(false);
     		clear.setEnabled(false);
+    	} else {
+    		clear.setEnabled(true);
     	}
 	}
 	
@@ -325,7 +327,6 @@ public class QueryTab extends JPanel {
 		add.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent ae) {
             	filterBuilder.setVisible(true);
-            	clear.setEnabled(true);
             }
         });
 		p.add(add);

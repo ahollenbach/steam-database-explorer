@@ -27,7 +27,8 @@ public enum SystemCode {
 	BAD_FK      ("Cannot find a? that matches the details you gave us! "		,false),
 	/** The value was not of the correct type. Must couple with alterMessage to give appropriate response*/
 	BAD_VALUE   ("Sorry, ? is of the incorrect type."							,false),
-	ALREADY_EXIST("Sorry, an entry already exists with these attributes."		,false);
+	ALREADY_EXIST("Sorry, an entry already exists with these attributes."		,false), 
+	MISSING_PK("You must fill out a value for ?."								,false);
 
 	/**
 	 * A message describing the system code.

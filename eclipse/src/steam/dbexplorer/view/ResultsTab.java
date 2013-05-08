@@ -136,6 +136,7 @@ public class ResultsTab extends JPanel {
 		DefaultTableModel tableModel = new DefaultTableModel(data,labels) {
 		   @Override
 		   public boolean isCellEditable(int row, int column) {
+			   if(currentTable.equals("Friends")) return false;
 			    return !notEditableColumns.contains(column);
 		   }
 		};

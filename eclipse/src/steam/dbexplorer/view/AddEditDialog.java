@@ -106,7 +106,7 @@ class AddEditDialog extends JDialog {
     	main.setMinimumSize(new Dimension(300,250));
     	this.add(main);
     	this.setMinimumSize(new Dimension(300,250));
-    	this.setTitle("Add new " + tableName);
+    	this.setTitle("Add New " + tableName.substring(0,tableName.length()-1));
     	this.setVisible(true);
     }
 }

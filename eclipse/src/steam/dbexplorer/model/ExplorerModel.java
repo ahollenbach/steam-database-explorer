@@ -139,7 +139,15 @@ public class ExplorerModel {
 			return r;
 		} else if(message.contains("ERROR: duplicate key")) {
 			return SystemCode.ALREADY_EXIST;
+		} else if(message.contains("ERROR: null value")) {
+			SystemCode r = SystemCode.MISSING_PK;
+			int firstQuote = message.indexOf("\"")+1;
+			String missingPK = message.substring(firstQuote,message.indexOf("\"", firstQuote));
+			r.alterMessage(missingPK);
+			ex.printStackTrace();
+			return SystemCode.MISSING_PK;
 		}
+		ex.printStackTrace();
 		return SystemCode.FAILURE;
 	}
 
