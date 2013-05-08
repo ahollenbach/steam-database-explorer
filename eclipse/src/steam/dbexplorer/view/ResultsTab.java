@@ -37,6 +37,7 @@ public class ResultsTab extends JPanel {
 	private JTable results;
 	private JScrollPane scrollPane;
 	
+	private ArrayList<String> lastConstraints;
 	private String currentTable;
 	private HashSet<Integer> rowsChanged = new HashSet<Integer>();
 	private ArrayList<Integer> notEditableColumns = new ArrayList<Integer>();;
@@ -63,7 +64,12 @@ public class ResultsTab extends JPanel {
 	}
 	
 	public void updateTable(String tableName, Enumeration<String> constraintsEnum) {
-		ArrayList<String> constraintsAL = constraintsEnum != null ? Collections.list(constraintsEnum) : new ArrayList<String>();
+		updateTable(tableName, Collections.list(constraintsEnum));
+	}
+	
+	public void updateTable(String tableName, ArrayList<String> constraintsAL) {
+		lastConstraints = constraintsAL;
+		//ArrayList<String> constraintsAL = constraintsEnum != null ? Collections.list(constraintsEnum) : new ArrayList<String>();
 		String[] constraints = new String[constraintsAL.size()];
 		constraints = constraintsAL.toArray(constraints);
 		Object[][] data = controller.getData(tableName,constraints);
@@ -155,8 +161,13 @@ public class ResultsTab extends JPanel {
 		this.queryTab = queryPanel;
 	}
 	
-	public void addElemToTable(String tableName, String[] values) {
-		updateTable(controller.getCurrentTable(), null);
+	/**
+	 * Adds the newly created element to the table. It does so by re-querying
+	 * with the same parameters and table. This will always add the new 
+	 * element to the current table.
+	 */
+	public void addElemToTable() {
+		updateTable(controller.getCurrentTable(), lastConstraints);
 		//((DefaultTableModel)results.getModel()).addRow(values);
 	}
 }

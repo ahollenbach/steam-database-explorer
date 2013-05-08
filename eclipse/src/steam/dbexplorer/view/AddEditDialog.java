@@ -81,7 +81,6 @@ class AddEditDialog extends JDialog {
 					//results[idx] = val;
 				}
 				
-				motherFrame.addElemToTable(currentTable,displayResults);
 				SystemCode result = ExplorerController.createEntry(currentTable, results);
 				if(!result.isSuccess()) {
 					JOptionPane.showMessageDialog(null, 
@@ -89,6 +88,7 @@ class AddEditDialog extends JDialog {
 												  "Insertion Error",
 												  JOptionPane.ERROR_MESSAGE);
 				} else {
+					motherFrame.addElemToTable();
 					AddEditDialog.this.dispose();
 				}
 			}
