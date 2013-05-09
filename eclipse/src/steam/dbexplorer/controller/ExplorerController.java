@@ -244,6 +244,8 @@ public class ExplorerController {
 		values.put("Date Joined", "player.timeCreated");
 		values.put("Steam ID #1", "friend.steamId1");
 		values.put("Steam ID #2", "friend.steamId2");
+		values.put("Persona Name #1", "one.personaName");
+		values.put("Persona Name #2", "two.personaName");
 		values.put("Application Name", "application.appName");
 		values.put("Achievement Name", "achievement.achievementName");
 		
